@@ -3,18 +3,20 @@ export default defineAppConfig({
     'pages/index/index',
     'pages/youtube/index',
     'pages/sports/index',
-    'pages/social/index'
+    'pages/social/index',
+    'pages/onboarding/index'
   ],
   window: {
-    backgroundTextStyle: 'light',
-    navigationBarBackgroundColor: '#4F46E5',
+    backgroundTextStyle: 'dark',
+    navigationBarBackgroundColor: '#1F2937',
     navigationBarTitleText: '运动读书',
     navigationBarTextStyle: 'white'
   },
+  lazyCodeLoading: 'requiredComponents',
   tabBar: {
-    color: '#999999',
-    selectedColor: '#4F46E5',
-    backgroundColor: '#ffffff',
+    color: '#9CA3AF',
+    selectedColor: '#F97316',
+    backgroundColor: '#FFFFFF',
     borderStyle: 'black',
     list: [
       {

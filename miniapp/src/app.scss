@@ -1,51 +1,158 @@
-// 全局样式
+// ============================================
+// 全局设计系统 - 橙紫活力风格
+// ============================================
+
+// CSS 变量定义
 page {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: #f5f5f5;
+  --color-primary: #F97316;          // 主色-橙色
+  --color-primary-light: #FDBA74;    // 浅橙
+  --color-primary-dark: #EA580C;     // 深橙
+  
+  --color-secondary: #8B5CF6;        // 辅助色-紫色
+  --color-secondary-light: #A78BFA;  // 浅紫
+  --color-secondary-dark: #7C3AED;   // 深紫
+  
+  --color-dark: #1F2937;             // 深色卡片背景
+  --color-dark-light: #374151;       // 稍浅深色
+  --color-dark-lighter: #4B5563;     // 更浅
+  
+  --color-bg: #F8FAFC;               // 页面背景
+  --color-card: #FFFFFF;             // 卡片背景
+  
+  --color-text-primary: #1F2937;     // 主要文字
+  --color-text-secondary: #6B7280;   // 次要文字
+  --color-text-muted: #9CA3AF;       // 弱化文字
+  --color-text-white: #FFFFFF;       // 白色文字
+  
+  --gradient-primary: linear-gradient(135deg, #F97316 0%, #FDBA74 100%);
+  --gradient-secondary: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
+  --gradient-dark: linear-gradient(180deg, #1F2937 0%, #374151 100%);
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --shadow-orange: 0 4px 16px rgba(249, 115, 22, 0.3);
+  --shadow-purple: 0 4px 16px rgba(139, 92, 246, 0.3);
+  
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+  
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-size: 28px;
+  line-height: 1.5;
 }
 
-// 通用类
-.container {
-  padding: 20px;
-}
+// ============================================
+// 通用组件样式
+// ============================================
 
+// 卡片样式
 .card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
 }
 
-.title {
-  font-size: 32px;
+.card-dark {
+  background: var(--color-dark);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  color: var(--color-text-white);
+}
+
+// 按钮样式
+.btn-primary {
+  background: var(--gradient-primary);
+  color: var(--color-text-white);
+  border-radius: var(--radius-full);
+  padding: 20px 48px;
+  font-size: 30px;
   font-weight: 600;
-  color: #1a1a1a;
+  text-align: center;
+  box-shadow: var(--shadow-orange);
+  border: none;
+  
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
 }
 
-.subtitle {
-  font-size: 28px;
-  font-weight: 500;
-  color: #333333;
+.btn-secondary {
+  background: var(--gradient-secondary);
+  color: var(--color-text-white);
+  border-radius: var(--radius-full);
+  padding: 20px 48px;
+  font-size: 30px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: var(--shadow-purple);
+  border: none;
+  
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
 }
 
-.text {
+.btn-outline {
+  background: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  padding: 18px 46px;
+  font-size: 30px;
+  font-weight: 600;
+  text-align: center;
+  
+  &:active {
+    background: rgba(249, 115, 22, 0.1);
+  }
+}
+
+// 标题样式
+.title-lg {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.title-md {
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.title-sm {
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.text-body {
   font-size: 28px;
-  color: #666666;
+  color: var(--color-text-secondary);
 }
 
 .text-small {
   font-size: 24px;
-  color: #999999;
+  color: var(--color-text-muted);
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-  color: #ffffff;
-  border-radius: 24px;
-  padding: 12px 32px;
-  font-size: 28px;
-  text-align: center;
+.text-white {
+  color: var(--color-text-white);
+}
+
+// Flex 布局
+.flex {
+  display: flex;
 }
 
 .flex-row {
@@ -59,14 +166,120 @@ page {
   flex-direction: column;
 }
 
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .flex-1 {
   flex: 1;
 }
 
-.gap-sm {
-  gap: 8px;
+.gap-xs { gap: 8px; }
+.gap-sm { gap: 12px; }
+.gap-md { gap: 16px; }
+.gap-lg { gap: 24px; }
+.gap-xl { gap: 32px; }
+
+// 间距
+.p-sm { padding: 12px; }
+.p-md { padding: 16px; }
+.p-lg { padding: 24px; }
+
+.m-sm { margin: 12px; }
+.m-md { margin: 16px; }
+.m-lg { margin: 24px; }
+
+.mb-sm { margin-bottom: 12px; }
+.mb-md { margin-bottom: 16px; }
+.mb-lg { margin-bottom: 24px; }
+
+// 环形进度条容器
+.progress-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.gap-md {
-  gap: 16px;
+.progress-ring-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 12px solid rgba(255, 255, 255, 0.1);
+}
+
+.progress-ring-value {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+// 数据统计卡片
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  
+  .stat-value {
+    font-size: 44px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  
+  .stat-label {
+    font-size: 24px;
+    opacity: 0.8;
+  }
+}
+
+// 图标容器
+.icon-box {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  
+  &.orange {
+    background: rgba(249, 115, 22, 0.15);
+    color: var(--color-primary);
+  }
+  
+  &.purple {
+    background: rgba(139, 92, 246, 0.15);
+    color: var(--color-secondary);
+  }
+  
+  &.dark {
+    background: var(--color-dark);
+    color: var(--color-text-white);
+  }
+}
+
+// 分割线
+.divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.06);
+  margin: 16px 0;
+}
+
+// 安全区域底部
+.safe-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 120px);
 }

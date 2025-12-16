@@ -62,9 +62,6 @@ export default function SocialPage() {
     }
 
     setLoading(true);
-    
-    // TODO: 实际项目中需要先上传图片到对象存储获取URL
-    // 这里简化处理，直接使用本地路径（仅用于演示）
     const result = await socialApi.createPost(userInfo.id, content, images);
     
     if (result.success) {
@@ -94,14 +91,24 @@ export default function SocialPage() {
     return `${date.getMonth() + 1}月${date.getDate()}日`;
   };
 
+  // 生成头像颜色
+  const getAvatarColor = (name: string) => {
+    const colors = ['#F97316', '#8B5CF6', '#10B981', '#3B82F6', '#EC4899', '#F59E0B'];
+    const index = name.charCodeAt(0) % colors.length;
+    return colors[index];
+  };
+
   return (
     <View className='social-page'>
-      <View className='page-header'>
+      {/* 顶部区域 */}
+      <View className='page-hero'>
+        <View className='hero-content'>
         <Text className='page-title'>💬 匿名树洞</Text>
-        <Text className='page-desc'>分享心情，释放压力，完全匿名</Text>
+          <Text className='page-subtitle'>分享心情，完全匿名，释放压力</Text>
+        </View>
       </View>
 
-      {/* Compose Button */}
+      {/* 发布按钮 */}
       <View 
         className='compose-fab' 
         onClick={() => setShowComposer(true)}
@@ -109,39 +116,52 @@ export default function SocialPage() {
         <Text className='fab-icon'>✏️</Text>
       </View>
 
-      {/* Composer Modal */}
+      {/* 发布弹窗 */}
       {showComposer && (
-        <View className='composer-mask' onClick={() => setShowComposer(false)}>
+        <View className='composer-overlay' onClick={() => setShowComposer(false)}>
           <View className='composer-modal' onClick={(e) => e.stopPropagation()}>
             <View className='composer-header'>
               <Text className='composer-title'>发布心情</Text>
-              <Text className='composer-close' onClick={() => setShowComposer(false)}>✕</Text>
+              <View className='composer-close' onClick={() => setShowComposer(false)}>
+                <Text>✕</Text>
+              </View>
             </View>
+            
             <Textarea
-              className='composer-input'
-              placeholder='说点什么吧...'
+              className='composer-textarea'
+              placeholder='说点什么吧，完全匿名，放心分享...'
               value={content}
               onInput={(e) => setContent(e.detail.value)}
               maxlength={500}
+              autoFocus
             />
-            <View className='composer-images'>
+            
+            {/* 图片预览 */}
+            <View className='image-preview'>
               {images.map((img, index) => (
-                <View key={index} className='image-item'>
+                <View key={index} className='preview-item'>
                   <Image src={img} mode='aspectFill' className='preview-image' />
-                  <Text 
+                  <View 
                     className='remove-btn' 
                     onClick={() => handleRemoveImage(index)}
-                  >✕</Text>
+                  >
+                    <Text>✕</Text>
+                  </View>
                 </View>
               ))}
               {images.length < 9 && (
-                <View className='add-image' onClick={handleChooseImage}>
+                <View className='add-image-btn' onClick={handleChooseImage}>
                   <Text className='add-icon'>+</Text>
+                  <Text className='add-text'>图片</Text>
                 </View>
               )}
             </View>
+            
             <View className='composer-footer'>
-              <Text className='anonymous-hint'>🎭 将以匿名身份发布</Text>
+              <View className='anonymous-badge'>
+                <Text className='badge-icon'>🎭</Text>
+                <Text className='badge-text'>匿名发布</Text>
+              </View>
               <Button 
                 className='publish-btn' 
                 onClick={handlePublish}
@@ -154,25 +174,38 @@ export default function SocialPage() {
         </View>
       )}
 
-      {/* Posts List */}
-      <ScrollView scrollY className='posts-list'>
+      {/* 帖子列表 */}
+      <ScrollView scrollY className='posts-container'>
+        <View className='posts-inner'>
         {posts.length === 0 ? (
-          <View className='empty'>
+            <View className='empty-state'>
             <Text className='empty-icon'>🌱</Text>
-            <Text className='empty-text'>还没有内容</Text>
-            <Text className='empty-hint'>成为第一个分享的人吧</Text>
+              <Text className='empty-title'>还没有内容</Text>
+              <Text className='empty-desc'>成为第一个分享的人吧</Text>
           </View>
         ) : (
           posts.map(post => (
-            <View key={post.id} className='post-card card'>
+              <View key={post.id} className='post-card'>
               <View className='post-header'>
-                <Text className='anonymous-name'>🎭 {post.anonymous_name}</Text>
+                  <View 
+                    className='avatar'
+                    style={{ background: getAvatarColor(post.anonymous_name) }}
+                  >
+                    <Text className='avatar-text'>
+                      {post.anonymous_name.charAt(0)}
+                    </Text>
+                  </View>
+                  <View className='user-info'>
+                    <Text className='user-name'>{post.anonymous_name}</Text>
                 <Text className='post-time'>{formatTime(post.created_at)}</Text>
               </View>
+                </View>
+                
               <Text className='post-content'>{post.content}</Text>
+                
               {post.image_urls && post.image_urls.length > 0 && (
-                <View className='post-images'>
-                  {post.image_urls.map((url, index) => (
+                  <View className={`post-images count-${Math.min(post.image_urls.length, 3)}`}>
+                    {post.image_urls.slice(0, 9).map((url, index) => (
                     <Image 
                       key={index} 
                       src={url} 
@@ -183,9 +216,21 @@ export default function SocialPage() {
                   ))}
                 </View>
               )}
+                
+                <View className='post-actions'>
+                  <View className='action-item'>
+                    <Text className='action-icon'>❤️</Text>
+                    <Text className='action-text'>喜欢</Text>
+                  </View>
+                  <View className='action-item'>
+                    <Text className='action-icon'>💬</Text>
+                    <Text className='action-text'>评论</Text>
+                  </View>
+                </View>
             </View>
           ))
         )}
+        </View>
       </ScrollView>
     </View>
   );

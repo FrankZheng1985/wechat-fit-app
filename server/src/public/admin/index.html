@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>运动读书 - 管理后台</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #1F2937 0%, #111827 100%);
+      min-height: 100vh;
+      color: #E5E7EB;
+    }
+
+    /* 登录页面 */
+    .login-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .login-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 48px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-logo {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .login-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #F97316, #8B5CF6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .login-subtitle {
+      color: #9CA3AF;
+      margin-bottom: 32px;
+    }
+
+    .login-input {
+      width: 100%;
+      height: 52px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0 20px;
+      color: #fff;
+      font-size: 16px;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .login-input:focus {
+      border-color: #F97316;
+    }
+
+    .login-btn {
+      width: 100%;
+      height: 52px;
+      background: linear-gradient(135deg, #F97316, #EA580C);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+    }
+
+    /* 主布局 */
+    .app-container {
+      display: none;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 260px;
+      height: 100vh;
+      background: rgba(17, 24, 39, 0.95);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 24px;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .sidebar-logo span:first-child {
+      font-size: 32px;
+    }
+
+    .sidebar-logo span:last-child {
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #F97316, #8B5CF6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #9CA3AF;
+      transition: all 0.2s;
+      margin-bottom: 8px;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(139, 92, 246, 0.2));
+      color: #F97316;
+    }
+
+    .nav-icon {
+      font-size: 20px;
+    }
+
+    /* 主内容区 */
+    .main-content {
+      margin-left: 260px;
+      padding: 32px;
+      min-height: 100vh;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+      color: #9CA3AF;
+    }
+
+    /* 统计卡片 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .stat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .stat-icon.orange { background: rgba(249, 115, 22, 0.2); }
+    .stat-icon.purple { background: rgba(139, 92, 246, 0.2); }
+    .stat-icon.green { background: rgba(16, 185, 129, 0.2); }
+    .stat-icon.blue { background: rgba(59, 130, 246, 0.2); }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      color: #9CA3AF;
+      font-size: 14px;
+    }
+
+    /* 表格 */
+    .data-table {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .table-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 16px 24px;
+      text-align: left;
+    }
+
+    th {
+      color: #9CA3AF;
+      font-weight: 500;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #F97316, #8B5CF6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge-success { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+    .badge-warning { background: rgba(245, 158, 11, 0.2); color: #F59E0B; }
+    .badge-danger { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
+
+    .btn-small {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-view {
+      background: rgba(59, 130, 246, 0.2);
+      color: #3B82F6;
+    }
+
+    .btn-delete {
+      background: rgba(239, 68, 68, 0.2);
+      color: #EF4444;
+    }
+
+    .btn-small:hover {
+      transform: scale(1.05);
+    }
+
+    /* 分页 */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 20px;
+    }
+
+    .page-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: transparent;
+      color: #9CA3AF;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .page-btn:hover, .page-btn.active {
+      background: #F97316;
+      border-color: #F97316;
+      color: #fff;
+    }
+
+    /* 隐藏的页面 */
+    .page-section {
+      display: none;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    /* 加载动画 */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #9CA3AF;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(249, 115, 22, 0.2);
+      border-top-color: #F97316;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 登录页面 -->
+  <div class="login-container" id="loginPage">
+    <div class="login-box">
+      <div class="login-logo">🏃📚</div>
+      <h1 class="login-title">管理后台</h1>
+      <p class="login-subtitle">运动读书社交小程序</p>
+      <input type="password" class="login-input" id="passwordInput" placeholder="请输入管理密码">
+      <button class="login-btn" onclick="login()">登录</button>
+    </div>
+  </div>
+
+  <!-- 主应用 -->
+  <div class="app-container" id="appContainer">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <span>🏃</span>
+        <span>管理后台</span>
+      </div>
+      <nav>
+        <div class="nav-item active" onclick="showPage('dashboard')">
+          <span class="nav-icon">📊</span>
+          <span>数据概览</span>
+        </div>
+        <div class="nav-item" onclick="showPage('users')">
+          <span class="nav-icon">👥</span>
+          <span>用户管理</span>
+        </div>
+        <div class="nav-item" onclick="showPage('posts')">
+          <span class="nav-icon">💬</span>
+          <span>帖子管理</span>
+        </div>
+        <div class="nav-item" onclick="showPage('leaderboard')">
+          <span class="nav-icon">🏆</span>
+          <span>运动排行</span>
+        </div>
+      </nav>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      <!-- 数据概览 -->
+      <div class="page-section active" id="dashboardPage">
+        <div class="page-header">
+          <h1 class="page-title">数据概览</h1>
+          <p class="page-subtitle">查看小程序整体运营数据</p>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon orange">👥</div>
+            </div>
+            <div class="stat-value" id="totalUsers">-</div>
+            <div class="stat-label">总用户数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon green">✅</div>
+            </div>
+            <div class="stat-value" id="activeToday">-</div>
+            <div class="stat-label">今日活跃</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon purple">💬</div>
+            </div>
+            <div class="stat-value" id="totalPosts">-</div>
+            <div class="stat-label">帖子总数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon blue">👟</div>
+            </div>
+            <div class="stat-value" id="todaySteps">-</div>
+            <div class="stat-label">今日总步数</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 用户管理 -->
+      <div class="page-section" id="usersPage">
+        <div class="page-header">
+          <h1 class="page-title">用户管理</h1>
+          <p class="page-subtitle">查看和管理所有用户</p>
+        </div>
+
+        <div class="data-table">
+          <div class="table-header">
+            <span class="table-title">用户列表</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>用户</th>
+                <th>兴趣</th>
+                <th>步数目标</th>
+                <th>状态</th>
+                <th>注册时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="6" class="loading"><div class="spinner"></div>加载中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 帖子管理 -->
+      <div class="page-section" id="postsPage">
+        <div class="page-header">
+          <h1 class="page-title">帖子管理</h1>
+          <p class="page-subtitle">管理社交帖子内容</p>
+        </div>
+
+        <div class="data-table">
+          <div class="table-header">
+            <span class="table-title">帖子列表</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>匿名昵称</th>
+                <th>内容</th>
+                <th>发布时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="postsTableBody">
+              <tr><td colspan="4" class="loading"><div class="spinner"></div>加载中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 运动排行 -->
+      <div class="page-section" id="leaderboardPage">
+        <div class="page-header">
+          <h1 class="page-title">运动排行榜</h1>
+          <p class="page-subtitle">过去7天步数排名</p>
+        </div>
+
+        <div class="data-table">
+          <div class="table-header">
+            <span class="table-title">排行榜</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>排名</th>
+                <th>用户</th>
+                <th>总步数</th>
+                <th>总卡路里</th>
+                <th>活跃天数</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardTableBody">
+              <tr><td colspan="5" class="loading"><div class="spinner"></div>加载中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // API 基础地址
+    const API_BASE = '/api/admin';
+    let adminPassword = '';
+
+    // 登录
+    function login() {
+      const password = document.getElementById('passwordInput').value;
+      if (!password) {
+        alert('请输入密码');
+        return;
+      }
+      
+      adminPassword = password;
+      
+      // 验证密码
+      fetch(`${API_BASE}/stats?password=${password}`)
+        .then(res => {
+          if (res.status === 401) {
+            alert('密码错误');
+            return;
+          }
+          return res.json();
+        })
+        .then(data => {
+          if (data && data.success) {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            loadDashboard();
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('连接失败，请检查服务器');
+        });
+    }
+
+    // 切换页面
+    function showPage(page) {
+      document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
+      document.getElementById(page + 'Page').classList.add('active');
+      event.target.closest('.nav-item').classList.add('active');
+      
+      if (page === 'dashboard') loadDashboard();
+      else if (page === 'users') loadUsers();
+      else if (page === 'posts') loadPosts();
+      else if (page === 'leaderboard') loadLeaderboard();
+    }
+
+    // 加载数据概览
+    function loadDashboard() {
+      fetch(`${API_BASE}/stats?password=${adminPassword}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('totalUsers').textContent = data.data.totalUsers.toLocaleString();
+            document.getElementById('activeToday').textContent = data.data.activeToday.toLocaleString();
+            document.getElementById('totalPosts').textContent = data.data.totalPosts.toLocaleString();
+            document.getElementById('todaySteps').textContent = data.data.todaySteps.toLocaleString();
+          }
+        });
+    }
+
+    // 加载用户列表
+    function loadUsers() {
+      fetch(`${API_BASE}/users?password=${adminPassword}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const tbody = document.getElementById('usersTableBody');
+            if (data.data.users.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#9CA3AF;">暂无用户</td></tr>';
+              return;
+            }
+            tbody.innerHTML = data.data.users.map(user => `
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar">${(user.nickname || '用户')[0]}</div>
+                    <div>
+                      <div>${user.nickname || '未设置昵称'}</div>
+                      <div style="font-size:12px;color:#9CA3AF;">ID: ${user.id}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>${(user.interests || []).join(', ') || '-'}</td>
+                <td>${(user.daily_step_goal || 10000).toLocaleString()} 步</td>
+                <td>
+                  <span class="badge ${user.is_onboarded ? 'badge-success' : 'badge-warning'}">
+                    ${user.is_onboarded ? '已激活' : '未完成引导'}
+                  </span>
+                </td>
+                <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                <td>
+                  <button class="btn-small btn-view" onclick="viewUser(${user.id})">查看</button>
+                </td>
+              </tr>
+            `).join('');
+          }
+        });
+    }
+
+    // 加载帖子列表
+    function loadPosts() {
+      fetch(`${API_BASE}/posts?password=${adminPassword}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const tbody = document.getElementById('postsTableBody');
+            if (data.data.posts.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:#9CA3AF;">暂无帖子</td></tr>';
+              return;
+            }
+            tbody.innerHTML = data.data.posts.map(post => `
+              <tr>
+                <td>${post.anonymous_name || '匿名用户'}</td>
+                <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${post.content}</td>
+                <td>${new Date(post.created_at).toLocaleString()}</td>
+                <td>
+                  <button class="btn-small btn-delete" onclick="deletePost(${post.id})">删除</button>
+                </td>
+              </tr>
+            `).join('');
+          }
+        });
+    }
+
+    // 加载排行榜
+    function loadLeaderboard() {
+      fetch(`${API_BASE}/leaderboard?password=${adminPassword}&days=7`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const tbody = document.getElementById('leaderboardTableBody');
+            if (data.data.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#9CA3AF;">暂无数据</td></tr>';
+              return;
+            }
+            tbody.innerHTML = data.data.map((user, index) => `
+              <tr>
+                <td>
+                  <span style="font-size:20px;">${index < 3 ? ['🥇', '🥈', '🥉'][index] : index + 1}</span>
+                </td>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar">${(user.nickname || '用户')[0]}</div>
+                    <span>${user.nickname || '用户' + user.id}</span>
+                  </div>
+                </td>
+                <td style="font-weight:600;color:#F97316;">${parseInt(user.total_steps).toLocaleString()} 步</td>
+                <td>${parseInt(user.total_calories).toLocaleString()} kcal</td>
+                <td>${user.active_days} 天</td>
+              </tr>
+            `).join('');
+          }
+        });
+    }
+
+    // 查看用户详情
+    function viewUser(userId) {
+      fetch(`${API_BASE}/users/${userId}?password=${adminPassword}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const user = data.data.user;
+            alert(`用户详情:\n昵称: ${user.nickname || '未设置'}\n性别: ${user.gender || '未设置'}\n兴趣: ${(user.interests || []).join(', ') || '未设置'}\n目标: ${user.daily_step_goal || 10000}步/天\n运动记录: ${data.data.activities.length}条\n发帖数: ${data.data.posts.length}条`);
+          }
+        });
+    }
+
+    // 删除帖子
+    function deletePost(postId) {
+      if (!confirm('确定要删除这条帖子吗？')) return;
+      
+      fetch(`${API_BASE}/posts/${postId}?password=${adminPassword}`, {
+        method: 'DELETE'
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert('删除成功');
+            loadPosts();
+          }
+        });
+    }
+
+    // 回车登录
+    document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') login();
+    });
+  </script>
+</body>
+</html>
+

@@ -98,4 +98,61 @@ router.get('/activities/:userId', async (req, res) => {
   }
 });
 
+// 获取用户信息
+router.get('/user/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const result = await pool.query(
+      `SELECT id, nickname, avatar_url, gender, age_range, interests, daily_step_goal, is_onboarded 
+       FROM users WHERE id = $1`,
+      [userId]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch user' });
+  }
+});
+
+// 更新用户资料（首次引导完成）
+router.post('/user/profile', async (req, res) => {
+  try {
+    const { userId, nickname, avatarUrl, gender, ageRange, interests, dailyStepGoal } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'User ID is required' });
+    }
+    
+    const result = await pool.query(
+      `UPDATE users SET 
+        nickname = COALESCE($2, nickname),
+        avatar_url = COALESCE($3, avatar_url),
+        gender = COALESCE($4, gender),
+        age_range = COALESCE($5, age_range),
+        interests = COALESCE($6, interests),
+        daily_step_goal = COALESCE($7, daily_step_goal),
+        is_onboarded = TRUE,
+        updated_at = CURRENT_TIMESTAMP
+       WHERE id = $1
+       RETURNING id, nickname, avatar_url, gender, age_range, interests, daily_step_goal, is_onboarded`,
+      [userId, nickname, avatarUrl, gender, ageRange, interests, dailyStepGoal]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    res.status(500).json({ success: false, message: 'Failed to update profile' });
+  }
+});
+
 export default router;

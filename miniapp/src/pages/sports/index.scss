@@ -1,117 +1,280 @@
+// ============================================
+// 运动页样式 - 橙紫活力风格
+// ============================================
+
 .sports-page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-bg);
   padding-bottom: 120px;
 }
 
-.page-header {
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-  padding: 32px;
-  color: #ffffff;
+// 顶部进度区域
+.progress-hero {
+  background: linear-gradient(180deg, #1F2937 0%, #374151 100%);
+  padding: 32px 24px 48px;
+  border-radius: 0 0 40px 40px;
+}
+
+.hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
   
   .page-title {
-    font-size: 40px;
+    font-size: 42px;
     font-weight: 700;
-    display: block;
-    margin-bottom: 8px;
+    color: #FFFFFF;
   }
   
-  .page-desc {
-    font-size: 26px;
-    opacity: 0.9;
+  .page-subtitle {
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.6);
   }
 }
 
-.today-card {
-  margin: -20px 24px 24px;
-  padding: 24px;
+// 时间筛选
+.time-filter {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  
+  .filter-item {
+    padding: 12px 24px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    
+    Text {
+      font-size: 24px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    &.active {
+      background: var(--color-secondary);
+      
+      Text {
+        color: #FFFFFF;
+        font-weight: 600;
+  }
+}
+  }
+}
+
+// 主环形进度
+.main-progress {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.progress-ring-large {
+  width: 320px;
+  height: 320px;
   position: relative;
-  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-fill-outer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  mask: radial-gradient(transparent 65%, #000 66%);
+  -webkit-mask: radial-gradient(transparent 65%, #000 66%);
+}
+
+.progress-fill-inner {
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  mask: radial-gradient(transparent 60%, #000 61%);
+  -webkit-mask: radial-gradient(transparent 60%, #000 61%);
+}
+
+.progress-center {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
   
-  .card-label {
-    font-size: 26px;
-    color: #999;
-    margin-bottom: 16px;
-    display: block;
+  .kcal-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
   }
   
-  .stats-grid {
+  .progress-value {
+    font-size: 64px;
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1;
+  }
+  
+  .progress-unit {
+    font-size: 28px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 4px;
+  }
+}
+
+// 底部统计
+.stats-row {
     display: flex;
-    justify-content: space-around;
-    margin-bottom: 24px;
+  justify-content: center;
+  gap: 48px;
+  margin-bottom: 32px;
   }
   
-  .stat-item {
-    text-align: center;
+.stat-circle {
+  .stat-ring {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 6px solid var(--color-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(249, 115, 22, 0.1);
+    
+    &.purple {
+      border-color: var(--color-secondary);
+      background: rgba(139, 92, 246, 0.1);
+    }
     
     .stat-value {
-      font-size: 48px;
+      font-size: 36px;
       font-weight: 700;
-      color: #10B981;
-      display: block;
+      color: #FFFFFF;
     }
     
     .stat-label {
-      font-size: 24px;
-      color: #999;
+      font-size: 22px;
+      color: rgba(255, 255, 255, 0.7);
     }
   }
+}
+
+// 按钮组
+.action-buttons {
+  display: flex;
+  gap: 16px;
   
-  .sync-btn {
-    width: 100%;
-    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-    color: #ffffff;
+  .btn-sync {
+    flex: 1;
+    background: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
+    color: #FFFFFF;
     border-radius: 24px;
-    font-size: 28px;
+    font-size: 32px;
+    font-weight: 700;
+    padding: 24px;
     border: none;
+    box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
     
     &::after {
       border: none;
     }
+    
+    &:active {
+      transform: scale(0.98);
+      opacity: 0.95;
+    }
   }
 }
 
+// 历史记录区域
 .history-section {
-  padding: 0 24px;
+  padding: 24px;
+  margin-top: -20px;
   
   .section-title {
-    font-size: 30px;
-    font-weight: 600;
-    color: #333;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--color-text-primary);
     margin-bottom: 16px;
     display: block;
   }
+}
+
+// 空状态
+.empty-state {
+  background: var(--color-card);
+  border-radius: 20px;
+  padding: 48px 24px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
   
-  .empty-history {
-    text-align: center;
-    padding: 40px;
-    color: #999;
-    font-size: 26px;
+  .empty-icon {
+    font-size: 64px;
+    display: block;
+    margin-bottom: 16px;
   }
   
-  .history-item {
+  .empty-text {
+    font-size: 30px;
+    color: var(--color-text-primary);
+    display: block;
+    margin-bottom: 8px;
+  }
+  
+  .empty-hint {
+    font-size: 26px;
+    color: var(--color-text-muted);
+  }
+}
+
+// 历史列表
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  }
+  
+.history-card {
+  background: var(--color-card);
+  border-radius: 16px;
+  padding: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px;
-    margin-bottom: 12px;
+  box-shadow: var(--shadow-sm);
     
+  .history-left {
     .history-date {
       font-size: 28px;
-      font-weight: 500;
-      color: #333;
+      font-weight: 600;
+      color: var(--color-text-primary);
     }
+  }
+  
+  .history-right {
+    display: flex;
+    gap: 20px;
     
-    .history-stats {
+    .history-stat {
       display: flex;
-      gap: 16px;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-bg);
+      padding: 8px 14px;
+      border-radius: 12px;
       
-      .history-stat {
+      .stat-icon {
+        font-size: 20px;
+      }
+      
+      .stat-num {
         font-size: 24px;
-        color: #666;
-        background: #f0f0f0;
-        padding: 4px 12px;
-        border-radius: 12px;
+        font-weight: 600;
+        color: var(--color-text-primary);
       }
     }
   }

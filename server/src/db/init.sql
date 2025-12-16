@@ -2,8 +2,13 @@
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     openid VARCHAR(255) UNIQUE NOT NULL,
-    nickname VARCHAR(255), -- Optional, for social features if not anonymous
+    nickname VARCHAR(255),
     avatar_url TEXT,
+    gender VARCHAR(10),
+    age_range VARCHAR(20),
+    interests TEXT[], -- 兴趣爱好数组：['运动', '读书', '音乐', '旅行']
+    daily_step_goal INTEGER DEFAULT 10000,
+    is_onboarded BOOLEAN DEFAULT FALSE, -- 是否完成引导
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

@@ -34,6 +34,13 @@ export default defineConfig(async (merge) => {
             generateScopedName: '[name]__[local]___[hash:base64:5]'
           }
         }
+      },
+      miniCssExtractPluginOption: {
+        ignoreOrder: true
+      },
+      webpackChain(chain) {
+        chain.mode('production');
+        chain.optimization.minimize(true);
       }
     },
     h5: {

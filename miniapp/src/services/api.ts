@@ -48,6 +48,22 @@ export const wechatApi = {
   
   getActivities: (userId: number, limit = 30) =>
     request(`/wechat/activities/${userId}?limit=${limit}`),
+
+  // 获取用户信息
+  getUser: (userId: number) =>
+    request(`/wechat/user/${userId}`),
+
+  // 更新用户资料
+  updateProfile: (data: {
+    userId: number;
+    nickname?: string;
+    avatarUrl?: string;
+    gender?: string;
+    ageRange?: string;
+    interests?: string[];
+    dailyStepGoal?: number;
+  }) =>
+    request('/wechat/user/profile', { method: 'POST', data }),
 };
 
 // Social API
