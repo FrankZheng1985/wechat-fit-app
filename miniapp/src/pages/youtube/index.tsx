@@ -1,51 +1,27 @@
-import { View, Text, ScrollView, Image } from '@tarojs/components';
+import { View, Text, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
-import { useState, useEffect } from 'react';
-import { youtubeApi } from '../../services/api';
+import { useState } from 'react';
 import './index.scss';
 
-// 示例学习内容
-const LEARNING_CATEGORIES = [
-  { id: 'reading', name: '读书笔记', icon: '📖', color: '#FF6B35' },
-  { id: 'study', name: '学习打卡', icon: '✍️', color: '#3B82F6' },
-  { id: 'video', name: '视频课程', icon: '🎬', color: '#10B981' },
-  { id: 'podcast', name: '播客音频', icon: '🎧', color: '#A855F7' },
+const COURSES = [
+  { id: 1, name: 'React 进阶', hours: 2, progress: 75, color: '#3B82F6', emoji: '⚛️' },
+  { id: 2, name: 'UI/UX 设计', hours: 1.5, progress: 45, color: '#A855F7', emoji: '🎨' },
+  { id: 3, name: '英语口语', hours: 3, progress: 60, color: '#10B981', emoji: '💬' },
 ];
 
-export default function Youtube() {
-  const [videos, setVideos] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [todayLearning, setTodayLearning] = useState(45); // 分钟
+const ACHIEVEMENTS = [
+  { id: 1, name: '7天连续学习', emoji: '🔥', unlocked: true },
+  { id: 2, name: '学霸勋章', emoji: '🏆', unlocked: true },
+  { id: 3, name: '完成10门课程', emoji: '🎓', unlocked: false },
+];
 
-  useEffect(() => {
-    fetchVideos();
-  }, []);
-
-  const fetchVideos = async () => {
-    setLoading(true);
-    try {
-      const result = await youtubeApi.getVideos();
-      if (result.success && result.data) {
-        setVideos(result.data);
-      }
-    } catch (error) {
-      console.error('Fetch videos error:', error);
-    }
-    setLoading(false);
-  };
-
-  const handleVideoClick = (video: any) => {
-    Taro.setClipboardData({
-      data: `https://www.youtube.com/watch?v=${video.video_id}`,
-      success: () => {
-        Taro.showToast({
-          title: '链接已复制',
-          icon: 'success'
-        });
-      }
-    });
-  };
+export default function Study() {
+  const [todayMinutes] = useState(80);
+  const [todayGoal] = useState(120);
+  const [weekCourses] = useState(3);
+  const [weekGoal] = useState(5);
+  const [totalHours] = useState(120);
+  const [efficiency] = useState(95);
 
   return (
     <View className='study-page'>
@@ -54,99 +30,115 @@ export default function Youtube() {
       {/* 标题 */}
       <View className='page-header'>
         <Text className='page-title'>学习中心 📚</Text>
-        <Text className='page-subtitle'>每天进步一点点</Text>
+        <Text className='page-subtitle'>持续学习，终身成长</Text>
       </View>
 
-      {/* 今日学习统计 */}
-      <View className='today-card'>
-        <View className='today-left'>
-          <Text className='today-emoji'>🎯</Text>
-          <View className='today-info'>
-            <Text className='today-label'>今日学习</Text>
-            <View className='today-value-row'>
-              <Text className='today-value'>{todayLearning}</Text>
-              <Text className='today-unit'>分钟</Text>
-            </View>
+      {/* 今日学习目标 */}
+      <View className='goal-card'>
+        <View className='goal-row'>
+          <Text className='goal-label'>今日学习目标</Text>
+          <View className='goal-value'>
+            <Text className='value-current'>{todayMinutes}</Text>
+            <Text className='value-divider'>/</Text>
+            <Text className='value-total'>{todayGoal} 分钟</Text>
           </View>
         </View>
-        <View className='today-btn'>
-          <Text>开始学习</Text>
-        </View>
-      </View>
-
-      {/* 分类 */}
-      <ScrollView scrollX className='category-scroll'>
-        <View className='category-list'>
+        <View className='progress-bar'>
           <View 
-            className={`category-item ${activeCategory === 'all' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('all')}
-          >
-            <Text>全部</Text>
+            className='progress-fill blue'
+            style={{ width: `${(todayMinutes / todayGoal) * 100}%` }}
+          />
+        </View>
+      </View>
+
+      <View className='goal-card'>
+        <View className='goal-row'>
+          <Text className='goal-label'>本周完成课程</Text>
+          <View className='goal-value'>
+            <Text className='value-current'>{weekCourses}</Text>
+            <Text className='value-divider'>/</Text>
+            <Text className='value-total'>{weekGoal} 节</Text>
           </View>
-          {LEARNING_CATEGORIES.map(cat => (
+        </View>
+        <View className='progress-bar'>
+          <View 
+            className='progress-fill green'
+            style={{ width: `${(weekCourses / weekGoal) * 100}%` }}
+          />
+        </View>
+      </View>
+
+      {/* 进行中的课程 */}
+      <View className='courses-section'>
+        <View className='section-header'>
+          <Text className='section-title'>进行中的课程</Text>
+          <Text className='section-link'>查看全部</Text>
+        </View>
+        
+        <View className='courses-list'>
+          {COURSES.map(course => (
             <View 
-              key={cat.id}
-              className={`category-item ${activeCategory === cat.id ? 'active' : ''}`}
-              onClick={() => setActiveCategory(cat.id)}
+              key={course.id} 
+              className='course-card'
+              style={{ background: `linear-gradient(135deg, ${course.color}, ${course.color}CC)` }}
             >
-              <Text>{cat.icon} {cat.name}</Text>
+              <Text className='course-emoji'>{course.emoji}</Text>
+              <View className='course-info'>
+                <Text className='course-name'>{course.name}</Text>
+                <Text className='course-time'>⏱ 已学习 {course.hours}小时</Text>
+                <View className='course-progress-bar'>
+                  <View 
+                    className='course-progress-fill'
+                    style={{ width: `${course.progress}%` }}
+                  />
+                </View>
+              </View>
+              <View className='course-percent'>
+                <Text className='percent-value'>{course.progress}%</Text>
+                <Text className='percent-label'>完成度</Text>
+              </View>
             </View>
           ))}
         </View>
-      </ScrollView>
-
-      {/* 快捷入口 */}
-      <View className='quick-grid'>
-        {LEARNING_CATEGORIES.map(cat => (
-          <View key={cat.id} className='quick-item' style={{ background: cat.color }}>
-            <Text className='quick-icon'>{cat.icon}</Text>
-            <Text className='quick-name'>{cat.name}</Text>
-          </View>
-        ))}
       </View>
 
-      {/* 内容列表 */}
-      <View className='content-section'>
-        <Text className='section-title'>推荐内容</Text>
+      {/* 我的成就 */}
+      <View className='achievements-section'>
+        <View className='section-header'>
+          <Text className='section-title'>🏅 我的成就</Text>
+        </View>
         
-        <ScrollView scrollY className='content-list'>
-          <View className='content-list-inner'>
-            {loading ? (
-              <View className='loading-state'>
-                <Text>加载中...</Text>
-              </View>
-            ) : videos.length > 0 ? videos.map((video, index) => (
-              <View 
-                key={index} 
-                className='content-card'
-                onClick={() => handleVideoClick(video)}
-              >
-                <View className='content-thumb'>
-                  {video.thumbnail_url ? (
-                    <Image src={video.thumbnail_url} mode='aspectFill' className='thumb-img' />
-                  ) : (
-                    <View className='thumb-placeholder'>
-                      <Text>📺</Text>
-                    </View>
-                  )}
-                  <View className='play-overlay'>
-                    <Text>▶</Text>
-                  </View>
-                </View>
-                <View className='content-info'>
-                  <Text className='content-title' numberOfLines={2}>{video.title}</Text>
-                  <Text className='content-meta'>{video.channel_name || '学习资源'}</Text>
-                </View>
-              </View>
-            )) : (
-              <View className='empty-state'>
-                <Text className='empty-emoji'>📚</Text>
-                <Text className='empty-text'>暂无学习内容</Text>
-                <Text className='empty-hint'>下拉刷新获取更多</Text>
-              </View>
-            )}
+        <View className='achievements-grid'>
+          {ACHIEVEMENTS.map(achievement => (
+            <View 
+              key={achievement.id} 
+              className={`achievement-card ${!achievement.unlocked ? 'locked' : ''}`}
+            >
+              <Text className='achievement-emoji'>{achievement.emoji}</Text>
+              <Text className='achievement-name'>{achievement.name}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* 底部统计 */}
+      <View className='stats-row'>
+        <View className='stat-box'>
+          <Text className='stat-icon'>📖</Text>
+          <Text className='stat-label'>累计学习</Text>
+          <View className='stat-value-row'>
+            <Text className='stat-value'>{totalHours}</Text>
+            <Text className='stat-unit'>小时</Text>
           </View>
-        </ScrollView>
+        </View>
+        <View className='stat-box'>
+          <Text className='stat-icon'>📈</Text>
+          <Text className='stat-label'>学习效率</Text>
+          <View className='stat-value-row'>
+            <Text className='stat-value'>{efficiency}%</Text>
+            <Text className='stat-unit'>超越同学</Text>
+          </View>
+        </View>
       </View>
     </View>
   );

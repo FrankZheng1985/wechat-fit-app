@@ -153,3 +153,31 @@
     color: #FFFFFF;
   }
 }
+
+// 每日金句
+.quote-card {
+  background: linear-gradient(135deg, #A855F7, #7C3AED);
+  border-radius: 20px;
+  padding: 24px;
+  margin-top: 24px;
+  
+  .quote-icon {
+    font-size: 24px;
+    margin-right: 8px;
+  }
+  
+  .quote-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #FFFFFF;
+    display: block;
+    margin-bottom: 12px;
+  }
+  
+  .quote-text {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    font-style: italic;
+  }
+}

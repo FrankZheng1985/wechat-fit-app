@@ -4,21 +4,28 @@ import { useState, useEffect } from 'react';
 import { socialApi } from '../../services/api';
 import './index.scss';
 
-const AVATAR_COLORS = ['#FF6B35', '#3B82F6', '#10B981', '#A855F7', '#F59E0B', '#EF4444'];
-const MOODS = [
-  { emoji: '😊', label: '开心' },
-  { emoji: '💪', label: '充实' },
-  { emoji: '📚', label: '学习' },
-  { emoji: '🏃', label: '运动' },
-  { emoji: '😴', label: '休息' },
-  { emoji: '🤔', label: '思考' },
+const HOT_TOPICS = [
+  { name: '#每日运动', count: '1.2k' },
+  { name: '#学习打卡', count: '956' },
+  { name: '#健康生活', count: '789' },
+];
+
+const CHALLENGES = [
+  { id: 1, name: '30天读书', participants: 156, color: '#3B82F6', emoji: '📚' },
+  { id: 2, name: '健身打卡', participants: 89, color: '#FF6B35', emoji: '💪' },
+  { id: 3, name: '早起挑战', participants: 234, color: '#F59E0B', emoji: '🌅' },
+];
+
+const MOCK_POSTS = [
+  { id: 1, name: '小红', time: '2分钟前', content: '刚完成跑步5公里', likes: 12, comments: 0 },
+  { id: 2, name: '小李', time: '15分钟前', content: '打卡今日学习计划', likes: 8, comments: 0 },
+  { id: 3, name: '小张', time: '1小时前', content: '挑战瑜伽30天 Day 7', likes: 25, comments: 0 },
 ];
 
 export default function Social() {
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<any[]>(MOCK_POSTS);
   const [showCompose, setShowCompose] = useState(false);
   const [content, setContent] = useState('');
-  const [selectedMood, setSelectedMood] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -28,12 +35,34 @@ export default function Social() {
   const fetchPosts = async () => {
     try {
       const result = await socialApi.getPosts();
-      if (result.success && result.data) {
-        setPosts(result.data);
+      if (result.success && result.data && result.data.length > 0) {
+        const formattedPosts = result.data.map((post: any, index: number) => ({
+          id: post.id || index,
+          name: post.anonymous_name || ['小红', '小李', '小张'][index % 3],
+          time: formatTime(post.created_at),
+          content: post.content,
+          likes: post.likes || Math.floor(Math.random() * 30),
+          comments: post.comments || 0
+        }));
+        setPosts(formattedPosts);
       }
     } catch (error) {
       console.error('Fetch posts error:', error);
     }
+  };
+
+  const formatTime = (date: string) => {
+    if (!date) return '刚刚';
+    const d = new Date(date);
+    const now = new Date();
+    const diff = now.getTime() - d.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+
+    if (minutes < 1) return '刚刚';
+    if (minutes < 60) return `${minutes}分钟前`;
+    if (hours < 24) return `${hours}小时前`;
+    return `${Math.floor(hours / 24)}天前`;
   };
 
   const handlePost = async () => {
@@ -47,14 +76,13 @@ export default function Social() {
       const userInfo = Taro.getStorageSync('userInfo');
       const result = await socialApi.createPost({
         userId: userInfo?.id,
-        content: selectedMood ? `${selectedMood} ${content}` : content,
+        content,
         isAnonymous: true
       });
 
       if (result.success) {
         Taro.showToast({ title: '发布成功', icon: 'success' });
         setContent('');
-        setSelectedMood('');
         setShowCompose(false);
         fetchPosts();
       }
@@ -64,43 +92,92 @@ export default function Social() {
     setLoading(false);
   };
 
-  const formatTime = (date: string) => {
-    const d = new Date(date);
-    const now = new Date();
-    const diff = now.getTime() - d.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-
-    if (minutes < 1) return '刚刚';
-    if (minutes < 60) return `${minutes}分钟前`;
-    if (hours < 24) return `${hours}小时前`;
-    if (days < 7) return `${days}天前`;
-    return `${d.getMonth() + 1}/${d.getDate()}`;
-  };
-
   return (
     <View className='social-page'>
       <View className='bg-gradient' />
 
       {/* 标题 */}
       <View className='page-header'>
-        <Text className='page-title'>成长日记 ✍️</Text>
-        <Text className='page-subtitle'>记录点滴，分享成长</Text>
+        <Text className='page-title'>社区动态 👥</Text>
+        <Text className='page-subtitle'>和朋友一起进步</Text>
       </View>
 
-      {/* 今日心情 */}
-      <View className='mood-card'>
-        <Text className='mood-label'>今日心情</Text>
-        <View className='mood-list'>
-          {MOODS.map(mood => (
+      {/* 热门话题 */}
+      <View className='topics-card'>
+        <View className='topics-header'>
+          <Text className='topics-icon'>📈</Text>
+          <Text className='topics-title'>热门话题</Text>
+        </View>
+        <View className='topics-list'>
+          {HOT_TOPICS.map((topic, index) => (
+            <View key={index} className='topic-item'>
+              <Text className='topic-name'>{topic.name}</Text>
+              <Text className='topic-count'>{topic.count} 讨论</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* 朋友动态 */}
+      <View className='posts-section'>
+        <Text className='section-title'>朋友动态</Text>
+        
+        <ScrollView scrollY className='posts-list'>
+          <View className='posts-list-inner'>
+            {posts.map((post, index) => (
+              <View key={post.id || index} className='post-card'>
+                <View className='post-header'>
+                  <View className='post-avatar'>
+                    <Text>😊</Text>
+                  </View>
+                  <View className='post-meta'>
+                    <Text className='post-name'>{post.name}</Text>
+                    <Text className='post-time'>{post.time}</Text>
+                  </View>
+                </View>
+                <Text className='post-content'>{post.content}</Text>
+                <View className='post-actions'>
+                  <View className='action-item'>
+                    <Text>👍 {post.likes}</Text>
+                  </View>
+                  <View className='action-item'>
+                    <Text>💬 评论</Text>
+                  </View>
+                  <View className='action-item'>
+                    <Text>↗ 分享</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+
+      {/* 热门挑战 */}
+      <View className='challenges-section'>
+        <View className='section-header'>
+          <Text className='section-title'>热门挑战</Text>
+          <Text className='section-link'>查看更多</Text>
+        </View>
+        
+        <View className='challenges-list'>
+          {CHALLENGES.map(challenge => (
             <View 
-              key={mood.emoji}
-              className={`mood-item ${selectedMood === mood.emoji ? 'active' : ''}`}
-              onClick={() => setSelectedMood(mood.emoji === selectedMood ? '' : mood.emoji)}
+              key={challenge.id} 
+              className='challenge-card'
+              style={{ background: challenge.color }}
             >
-              <Text className='mood-emoji'>{mood.emoji}</Text>
-              <Text className='mood-text'>{mood.label}</Text>
+              <View className='challenge-info'>
+                <Text className='challenge-emoji'>{challenge.emoji}</Text>
+                <View className='challenge-text'>
+                  <Text className='challenge-name'>{challenge.name}</Text>
+                  <Text className='challenge-count'>{challenge.participants} 人参与</Text>
+                </View>
+              </View>
+              <View className='join-btn'>
+                <Text className='join-icon'>👤+</Text>
+                <Text className='join-text'>加入</Text>
+              </View>
             </View>
           ))}
         </View>
@@ -108,49 +185,7 @@ export default function Social() {
 
       {/* 发布按钮 */}
       <View className='compose-btn' onClick={() => setShowCompose(true)}>
-        <Text className='compose-icon'>✏️</Text>
-        <Text className='compose-text'>写点什么...</Text>
-      </View>
-
-      {/* 帖子列表 */}
-      <View className='posts-section'>
-        <Text className='section-title'>大家的分享</Text>
-        
-        <ScrollView scrollY className='posts-list'>
-          <View className='posts-list-inner'>
-            {posts.length > 0 ? posts.map((post, index) => (
-              <View key={index} className='post-card'>
-                <View className='post-header'>
-                  <View 
-                    className='post-avatar'
-                    style={{ background: AVATAR_COLORS[index % AVATAR_COLORS.length] }}
-                  >
-                    <Text>{(post.anonymous_name || '匿名')[0]}</Text>
-                  </View>
-                  <View className='post-meta'>
-                    <Text className='post-name'>{post.anonymous_name || '匿名用户'}</Text>
-                    <Text className='post-time'>{formatTime(post.created_at)}</Text>
-                  </View>
-                </View>
-                <Text className='post-content'>{post.content}</Text>
-                <View className='post-actions'>
-                  <View className='action-item'>
-                    <Text>❤️ {post.likes || 0}</Text>
-                  </View>
-                  <View className='action-item'>
-                    <Text>💬 {post.comments || 0}</Text>
-                  </View>
-                </View>
-              </View>
-            )) : (
-              <View className='empty-state'>
-                <Text className='empty-emoji'>📝</Text>
-                <Text className='empty-text'>还没有内容</Text>
-                <Text className='empty-hint'>快来分享你的故事吧</Text>
-              </View>
-            )}
-          </View>
-        </ScrollView>
+        <Text>分享我的动态 ✨</Text>
       </View>
 
       {/* 发布弹窗 */}
@@ -159,19 +194,13 @@ export default function Social() {
           <View className='modal-overlay' onClick={() => setShowCompose(false)} />
           <View className='modal-content'>
             <View className='modal-header'>
-              <Text className='modal-title'>写日记</Text>
+              <Text className='modal-title'>分享动态</Text>
               <Text className='modal-close' onClick={() => setShowCompose(false)}>✕</Text>
             </View>
             
-            {selectedMood && (
-              <View className='selected-mood'>
-                <Text>心情：{selectedMood}</Text>
-              </View>
-            )}
-            
             <Textarea
               className='compose-input'
-              placeholder='记录今天的心情、收获、感想...'
+              placeholder='分享你的运动、学习心得...'
               value={content}
               onInput={(e) => setContent(e.detail.value)}
               maxlength={500}

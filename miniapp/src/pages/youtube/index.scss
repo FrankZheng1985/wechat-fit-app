@@ -12,7 +12,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(180deg, #FFF5E6 0%, #FFFAF0 30%, #FFFFFF 100%);
+  background: linear-gradient(180deg, #F5E6FF 0%, #FAF0FF 30%, #FFFFFF 100%);
   z-index: -1;
 }
 
@@ -34,226 +34,238 @@
   }
 }
 
-// 今日学习卡片
-.today-card {
-  background: linear-gradient(135deg, #FF8A50, #FF6B35);
+// 目标卡片
+.goal-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  
+  .goal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .goal-label {
+    font-size: 15px;
+    color: #374151;
+  }
+  
+  .goal-value {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+    
+    .value-current {
+      font-size: 18px;
+      font-weight: bold;
+      color: #3B82F6;
+    }
+    
+    .value-divider {
+      font-size: 14px;
+      color: #9CA3AF;
+    }
+    
+    .value-total {
+      font-size: 14px;
+      color: #6B7280;
+    }
+  }
+  
+  .progress-bar {
+    height: 8px;
+    background: #F3F4F6;
+    border-radius: 4px;
+    overflow: hidden;
+    
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+      
+      &.blue {
+        background: linear-gradient(90deg, #3B82F6, #60A5FA);
+      }
+      
+      &.green {
+        background: linear-gradient(90deg, #10B981, #34D399);
+      }
+    }
+  }
+}
+
+// 课程区域
+.courses-section {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  
+  .section-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1F2937;
+  }
+  
+  .section-link {
+    font-size: 14px;
+    color: #3B82F6;
+  }
+}
+
+.courses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.course-card {
   border-radius: 20px;
   padding: 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
+  gap: 16px;
   
-  .today-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  .course-emoji {
+    font-size: 36px;
   }
   
-  .today-emoji {
-    font-size: 40px;
-  }
-  
-  .today-info {
-    .today-label {
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.8);
-      display: block;
-      margin-bottom: 4px;
-    }
+  .course-info {
+    flex: 1;
     
-    .today-value-row {
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-    }
-    
-    .today-value {
-      font-size: 32px;
+    .course-name {
+      font-size: 18px;
       font-weight: bold;
       color: #FFFFFF;
+      display: block;
+      margin-bottom: 6px;
     }
     
-    .today-unit {
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.9);
+    .course-time {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
+      display: block;
+      margin-bottom: 10px;
+    }
+    
+    .course-progress-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+      overflow: hidden;
+      
+      .course-progress-fill {
+        height: 100%;
+        background: #FFFFFF;
+        border-radius: 3px;
+      }
     }
   }
   
-  .today-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    padding: 12px 20px;
-    color: #FFFFFF;
-    font-size: 14px;
-    font-weight: 600;
+  .course-percent {
+    text-align: right;
+    
+    .percent-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #FFFFFF;
+      display: block;
+    }
+    
+    .percent-label {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+    }
   }
 }
 
-// 分类滚动
-.category-scroll {
-  margin-bottom: 20px;
-  white-space: nowrap;
-}
-
-.category-list {
-  display: inline-flex;
-  gap: 12px;
-  padding: 4px 0;
-}
-
-.category-item {
-  background: #FFFFFF;
-  border-radius: 20px;
-  padding: 10px 20px;
-  font-size: 14px;
-  color: #6B7280;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  
-  &.active {
-    background: linear-gradient(135deg, #FF6B35, #F7931E);
-    color: #FFFFFF;
-  }
-}
-
-// 快捷入口网格
-.quick-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+// 成就区域
+.achievements-section {
   margin-bottom: 24px;
 }
 
-.quick-item {
-  border-radius: 16px;
-  padding: 16px 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  
-  .quick-icon {
-    font-size: 28px;
-  }
-  
-  .quick-name {
-    font-size: 12px;
-    color: #FFFFFF;
-    font-weight: 500;
-  }
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
-// 内容区域
-.content-section {
-  .section-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: #1F2937;
-    display: block;
-    margin-bottom: 16px;
-  }
-}
-
-.content-list {
-  height: 400px;
-}
-
-.content-list-inner {
-  padding-right: 4px;
-}
-
-.content-card {
+.achievement-card {
   background: #FFFFFF;
   border-radius: 16px;
-  overflow: hidden;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  
-  .content-thumb {
-    position: relative;
-    height: 160px;
-    background: #F3F4F6;
-    
-    .thumb-img {
-      width: 100%;
-      height: 100%;
-    }
-    
-    .thumb-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 48px;
-      background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
-    }
-    
-    .play-overlay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 56px;
-      height: 56px;
-      background: rgba(0, 0, 0, 0.6);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #FFFFFF;
-      font-size: 20px;
-    }
-  }
-  
-  .content-info {
-    padding: 16px;
-    
-    .content-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: #1F2937;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      margin-bottom: 8px;
-      line-height: 1.4;
-    }
-    
-    .content-meta {
-      font-size: 13px;
-      color: #9CA3AF;
-    }
-  }
-}
-
-// 加载和空状态
-.loading-state {
+  padding: 16px;
   text-align: center;
-  padding: 40px;
-  color: #9CA3AF;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   
-  .empty-emoji {
-    font-size: 64px;
-    display: block;
-    margin-bottom: 16px;
-  }
-  
-  .empty-text {
-    font-size: 18px;
-    font-weight: 600;
-    color: #6B7280;
+  .achievement-emoji {
+    font-size: 32px;
     display: block;
     margin-bottom: 8px;
   }
   
-  .empty-hint {
+  .achievement-name {
+    font-size: 12px;
+    color: #374151;
+    display: block;
+  }
+  
+  &.locked {
+    opacity: 0.5;
+    
+    .achievement-emoji {
+      filter: grayscale(100%);
+    }
+  }
+}
+
+// 底部统计
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.stat-box {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  
+  .stat-icon {
+    font-size: 20px;
+    display: block;
+    margin-bottom: 8px;
+  }
+  
+  .stat-label {
+    font-size: 14px;
+    color: #6B7280;
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+  .stat-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  
+  .stat-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #1F2937;
+  }
+  
+  .stat-unit {
     font-size: 14px;
     color: #9CA3AF;
   }
