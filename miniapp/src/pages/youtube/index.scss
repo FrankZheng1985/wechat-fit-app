@@ -1,228 +1,260 @@
-// ============================================
-// 读书视频页样式 - 橙紫活力风格
-// ============================================
-
-.youtube-page {
+.study-page {
   min-height: 100vh;
-  background: var(--color-bg);
-  padding-bottom: 120px;
-}
-
-// 顶部 Hero 区域
-.page-hero {
-  background: linear-gradient(135deg, #1F2937 0%, #374151 100%);
-  padding: 32px 24px 48px;
+  padding: 24px;
+  padding-bottom: 100px;
   position: relative;
-  overflow: hidden;
-  border-radius: 0 0 40px 40px;
+  box-sizing: border-box;
 }
 
-.hero-content {
-  position: relative;
-  z-index: 2;
-  
-  .page-title {
-    display: block;
-    font-size: 42px;
-    font-weight: 700;
-    color: #FFFFFF;
-    margin-bottom: 8px;
-  }
-  
-  .page-subtitle {
-    font-size: 26px;
-    color: rgba(255, 255, 255, 0.7);
-  }
-}
-
-.hero-decoration {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 200px;
-  height: 200px;
-  
-  .deco-circle {
-    position: absolute;
-    border-radius: 50%;
-    
-    &.c1 {
-      width: 160px;
-      height: 160px;
-      background: rgba(249, 115, 22, 0.2);
-      top: -40px;
-      right: -40px;
-    }
-    
-    &.c2 {
-      width: 100px;
-      height: 100px;
-      background: rgba(139, 92, 246, 0.2);
-      top: 60px;
-      right: 40px;
-    }
-    }
-  }
-  
-// 视频列表
-.video-list {
-  margin-top: -20px;
-  height: calc(100vh - 180px);
-    
-  .video-list-inner {
-    padding: 24px;
-    }
-  }
-
-// 加载状态
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 0;
-  
-  .loading-spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid var(--color-bg);
-    border-top-color: var(--color-primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 16px;
-  }
-  
-  .loading-text {
-    font-size: 28px;
-    color: var(--color-text-muted);
-  }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-// 空状态
-.empty-state {
-  background: var(--color-card);
-  border-radius: 24px;
-  padding: 64px 24px;
-  text-align: center;
-  box-shadow: var(--shadow-sm);
-  
-  .empty-icon {
-    font-size: 80px;
-    display: block;
-    margin-bottom: 16px;
-  }
-  
-  .empty-title {
-    font-size: 32px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    display: block;
-    margin-bottom: 8px;
-  }
-  
-  .empty-desc {
-    font-size: 26px;
-    color: var(--color-text-muted);
-  }
-}
-
-// 视频卡片
-.video-card {
-  background: var(--color-card);
-  border-radius: 20px;
-  overflow: hidden;
-  margin-bottom: 20px;
-  box-shadow: var(--shadow-md);
-  
-  &:active {
-    transform: scale(0.98);
-    opacity: 0.95;
-  }
-}
-
-.thumbnail-wrapper {
-  position: relative;
-  width: 100%;
-  height: 380px;
-  overflow: hidden;
-  
-  .video-thumbnail {
-    width: 100%;
-    height: 100%;
-  }
-}
-
-.play-overlay {
-  position: absolute;
+.bg-gradient {
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: linear-gradient(180deg, #FFF5E6 0%, #FFFAF0 30%, #FFFFFF 100%);
+  z-index: -1;
+}
+
+// 页面头部
+.page-header {
+  margin-bottom: 24px;
   
-  .play-button {
-    width: 80px;
-    height: 80px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    
-    .play-icon {
-      font-size: 32px;
-      color: var(--color-primary);
-      margin-left: 6px;
-    }
+  .page-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #1F2937;
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+  .page-subtitle {
+    font-size: 14px;
+    color: #6B7280;
   }
 }
 
-.video-duration {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  background: rgba(0, 0, 0, 0.75);
-  padding: 6px 12px;
-  border-radius: 8px;
+// 今日学习卡片
+.today-card {
+  background: linear-gradient(135deg, #FF8A50, #FF6B35);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
   
-  Text {
-    font-size: 22px;
+  .today-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .today-emoji {
+    font-size: 40px;
+  }
+  
+  .today-info {
+    .today-label {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      display: block;
+      margin-bottom: 4px;
+    }
+    
+    .today-value-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    
+    .today-value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #FFFFFF;
+    }
+    
+    .today-unit {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+  
+  .today-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
+
+// 分类滚动
+.category-scroll {
+  margin-bottom: 20px;
+  white-space: nowrap;
+}
+
+.category-list {
+  display: inline-flex;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.category-item {
+  background: #FFFFFF;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #6B7280;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  
+  &.active {
+    background: linear-gradient(135deg, #FF6B35, #F7931E);
     color: #FFFFFF;
   }
 }
 
-.video-info {
-  padding: 20px;
+// 快捷入口网格
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.quick-item {
+  border-radius: 16px;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   
-  .video-title {
-    font-size: 30px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    display: block;
-    margin-bottom: 12px;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  .quick-icon {
+    font-size: 28px;
+  }
+  
+  .quick-name {
+    font-size: 12px;
+    color: #FFFFFF;
+    font-weight: 500;
   }
 }
 
-.video-meta {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+// 内容区域
+.content-section {
+  .section-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1F2937;
+    display: block;
+    margin-bottom: 16px;
+  }
+}
+
+.content-list {
+  height: 400px;
+}
+
+.content-list-inner {
+  padding-right: 4px;
+}
+
+.content-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   
-  .video-date {
-    font-size: 24px;
-    color: var(--color-text-muted);
+  .content-thumb {
+    position: relative;
+    height: 160px;
+    background: #F3F4F6;
+    
+    .thumb-img {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .thumb-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
+    }
+    
+    .play-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 56px;
+      height: 56px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-size: 20px;
+    }
+  }
+  
+  .content-info {
+    padding: 16px;
+    
+    .content-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1F2937;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    
+    .content-meta {
+      font-size: 13px;
+      color: #9CA3AF;
+    }
+  }
+}
+
+// 加载和空状态
+.loading-state {
+  text-align: center;
+  padding: 40px;
+  color: #9CA3AF;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  
+  .empty-emoji {
+    font-size: 64px;
+    display: block;
+    margin-bottom: 16px;
+  }
+  
+  .empty-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: #6B7280;
+    display: block;
+    margin-bottom: 8px;
+  }
+  
+  .empty-hint {
+    font-size: 14px;
+    color: #9CA3AF;
   }
 }

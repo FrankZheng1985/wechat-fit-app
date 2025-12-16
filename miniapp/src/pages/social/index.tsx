@@ -1,22 +1,24 @@
-import { View, Text, Textarea, Button, Image, ScrollView } from '@tarojs/components';
+import { View, Text, ScrollView, Textarea, Button } from '@tarojs/components';
 import Taro from '@tarojs/taro';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { socialApi } from '../../services/api';
 import './index.scss';
 
-interface Post {
-  id: number;
-  content: string;
-  image_urls: string[];
-  anonymous_name: string;
-  created_at: string;
-}
+const AVATAR_COLORS = ['#FF6B35', '#3B82F6', '#10B981', '#A855F7', '#F59E0B', '#EF4444'];
+const MOODS = [
+  { emoji: '😊', label: '开心' },
+  { emoji: '💪', label: '充实' },
+  { emoji: '📚', label: '学习' },
+  { emoji: '🏃', label: '运动' },
+  { emoji: '😴', label: '休息' },
+  { emoji: '🤔', label: '思考' },
+];
 
-export default function SocialPage() {
-  const [posts, setPosts] = useState<Post[]>([]);
+export default function Social() {
+  const [posts, setPosts] = useState<any[]>([]);
+  const [showCompose, setShowCompose] = useState(false);
   const [content, setContent] = useState('');
-  const [images, setImages] = useState<string[]>([]);
-  const [showComposer, setShowComposer] = useState(false);
+  const [selectedMood, setSelectedMood] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -24,147 +26,163 @@ export default function SocialPage() {
   }, []);
 
   const fetchPosts = async () => {
-    const result = await socialApi.getPosts(20, 0);
-    if (result.success && result.data) {
-      setPosts(result.data);
-    }
-  };
-
-  const handleChooseImage = async () => {
     try {
-      const res = await Taro.chooseImage({
-        count: 9 - images.length,
-        sizeType: ['compressed'],
-        sourceType: ['album', 'camera']
-      });
-      setImages([...images, ...res.tempFilePaths]);
+      const result = await socialApi.getPosts();
+      if (result.success && result.data) {
+        setPosts(result.data);
+      }
     } catch (error) {
-      console.log('Image choose cancelled');
+      console.error('Fetch posts error:', error);
     }
   };
 
-  const handleRemoveImage = (index: number) => {
-    const newImages = [...images];
-    newImages.splice(index, 1);
-    setImages(newImages);
-  };
-
-  const handlePublish = async () => {
+  const handlePost = async () => {
     if (!content.trim()) {
       Taro.showToast({ title: '请输入内容', icon: 'none' });
       return;
     }
 
-    const userInfo = Taro.getStorageSync('userInfo');
-    if (!userInfo?.id) {
-      Taro.showToast({ title: '请先登录', icon: 'none' });
-      return;
-    }
-
     setLoading(true);
-    const result = await socialApi.createPost(userInfo.id, content, images);
-    
-    if (result.success) {
-      Taro.showToast({ title: '发布成功', icon: 'success' });
-      setContent('');
-      setImages([]);
-      setShowComposer(false);
-      fetchPosts();
-    } else {
-      Taro.showToast({ title: result.message || '发布失败', icon: 'none' });
+    try {
+      const userInfo = Taro.getStorageSync('userInfo');
+      const result = await socialApi.createPost({
+        userId: userInfo?.id,
+        content: selectedMood ? `${selectedMood} ${content}` : content,
+        isAnonymous: true
+      });
+
+      if (result.success) {
+        Taro.showToast({ title: '发布成功', icon: 'success' });
+        setContent('');
+        setSelectedMood('');
+        setShowCompose(false);
+        fetchPosts();
+      }
+    } catch (error) {
+      Taro.showToast({ title: '发布失败', icon: 'none' });
     }
     setLoading(false);
   };
 
-  const formatTime = (dateStr: string) => {
-    const date = new Date(dateStr);
+  const formatTime = (date: string) => {
+    const d = new Date(date);
     const now = new Date();
-    const diff = now.getTime() - date.getTime();
+    const diff = now.getTime() - d.getTime();
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
-    
+
     if (minutes < 1) return '刚刚';
     if (minutes < 60) return `${minutes}分钟前`;
     if (hours < 24) return `${hours}小时前`;
     if (days < 7) return `${days}天前`;
-    return `${date.getMonth() + 1}月${date.getDate()}日`;
-  };
-
-  // 生成头像颜色
-  const getAvatarColor = (name: string) => {
-    const colors = ['#F97316', '#8B5CF6', '#10B981', '#3B82F6', '#EC4899', '#F59E0B'];
-    const index = name.charCodeAt(0) % colors.length;
-    return colors[index];
+    return `${d.getMonth() + 1}/${d.getDate()}`;
   };
 
   return (
     <View className='social-page'>
-      {/* 顶部区域 */}
-      <View className='page-hero'>
-        <View className='hero-content'>
-        <Text className='page-title'>💬 匿名树洞</Text>
-          <Text className='page-subtitle'>分享心情，完全匿名，释放压力</Text>
+      <View className='bg-gradient' />
+
+      {/* 标题 */}
+      <View className='page-header'>
+        <Text className='page-title'>成长日记 ✍️</Text>
+        <Text className='page-subtitle'>记录点滴，分享成长</Text>
+      </View>
+
+      {/* 今日心情 */}
+      <View className='mood-card'>
+        <Text className='mood-label'>今日心情</Text>
+        <View className='mood-list'>
+          {MOODS.map(mood => (
+            <View 
+              key={mood.emoji}
+              className={`mood-item ${selectedMood === mood.emoji ? 'active' : ''}`}
+              onClick={() => setSelectedMood(mood.emoji === selectedMood ? '' : mood.emoji)}
+            >
+              <Text className='mood-emoji'>{mood.emoji}</Text>
+              <Text className='mood-text'>{mood.label}</Text>
+            </View>
+          ))}
         </View>
       </View>
 
       {/* 发布按钮 */}
-      <View 
-        className='compose-fab' 
-        onClick={() => setShowComposer(true)}
-      >
-        <Text className='fab-icon'>✏️</Text>
+      <View className='compose-btn' onClick={() => setShowCompose(true)}>
+        <Text className='compose-icon'>✏️</Text>
+        <Text className='compose-text'>写点什么...</Text>
+      </View>
+
+      {/* 帖子列表 */}
+      <View className='posts-section'>
+        <Text className='section-title'>大家的分享</Text>
+        
+        <ScrollView scrollY className='posts-list'>
+          <View className='posts-list-inner'>
+            {posts.length > 0 ? posts.map((post, index) => (
+              <View key={index} className='post-card'>
+                <View className='post-header'>
+                  <View 
+                    className='post-avatar'
+                    style={{ background: AVATAR_COLORS[index % AVATAR_COLORS.length] }}
+                  >
+                    <Text>{(post.anonymous_name || '匿名')[0]}</Text>
+                  </View>
+                  <View className='post-meta'>
+                    <Text className='post-name'>{post.anonymous_name || '匿名用户'}</Text>
+                    <Text className='post-time'>{formatTime(post.created_at)}</Text>
+                  </View>
+                </View>
+                <Text className='post-content'>{post.content}</Text>
+                <View className='post-actions'>
+                  <View className='action-item'>
+                    <Text>❤️ {post.likes || 0}</Text>
+                  </View>
+                  <View className='action-item'>
+                    <Text>💬 {post.comments || 0}</Text>
+                  </View>
+                </View>
+              </View>
+            )) : (
+              <View className='empty-state'>
+                <Text className='empty-emoji'>📝</Text>
+                <Text className='empty-text'>还没有内容</Text>
+                <Text className='empty-hint'>快来分享你的故事吧</Text>
+              </View>
+            )}
+          </View>
+        </ScrollView>
       </View>
 
       {/* 发布弹窗 */}
-      {showComposer && (
-        <View className='composer-overlay' onClick={() => setShowComposer(false)}>
-          <View className='composer-modal' onClick={(e) => e.stopPropagation()}>
-            <View className='composer-header'>
-              <Text className='composer-title'>发布心情</Text>
-              <View className='composer-close' onClick={() => setShowComposer(false)}>
-                <Text>✕</Text>
-              </View>
+      {showCompose && (
+        <View className='compose-modal'>
+          <View className='modal-overlay' onClick={() => setShowCompose(false)} />
+          <View className='modal-content'>
+            <View className='modal-header'>
+              <Text className='modal-title'>写日记</Text>
+              <Text className='modal-close' onClick={() => setShowCompose(false)}>✕</Text>
             </View>
             
+            {selectedMood && (
+              <View className='selected-mood'>
+                <Text>心情：{selectedMood}</Text>
+              </View>
+            )}
+            
             <Textarea
-              className='composer-textarea'
-              placeholder='说点什么吧，完全匿名，放心分享...'
+              className='compose-input'
+              placeholder='记录今天的心情、收获、感想...'
               value={content}
               onInput={(e) => setContent(e.detail.value)}
               maxlength={500}
               autoFocus
             />
             
-            {/* 图片预览 */}
-            <View className='image-preview'>
-              {images.map((img, index) => (
-                <View key={index} className='preview-item'>
-                  <Image src={img} mode='aspectFill' className='preview-image' />
-                  <View 
-                    className='remove-btn' 
-                    onClick={() => handleRemoveImage(index)}
-                  >
-                    <Text>✕</Text>
-                  </View>
-                </View>
-              ))}
-              {images.length < 9 && (
-                <View className='add-image-btn' onClick={handleChooseImage}>
-                  <Text className='add-icon'>+</Text>
-                  <Text className='add-text'>图片</Text>
-                </View>
-              )}
-            </View>
-            
-            <View className='composer-footer'>
-              <View className='anonymous-badge'>
-                <Text className='badge-icon'>🎭</Text>
-                <Text className='badge-text'>匿名发布</Text>
-              </View>
+            <View className='compose-footer'>
+              <Text className='char-count'>{content.length}/500</Text>
               <Button 
-                className='publish-btn' 
-                onClick={handlePublish}
+                className='post-btn' 
+                onClick={handlePost}
                 loading={loading}
               >
                 发布
@@ -173,65 +191,6 @@ export default function SocialPage() {
           </View>
         </View>
       )}
-
-      {/* 帖子列表 */}
-      <ScrollView scrollY className='posts-container'>
-        <View className='posts-inner'>
-        {posts.length === 0 ? (
-            <View className='empty-state'>
-            <Text className='empty-icon'>🌱</Text>
-              <Text className='empty-title'>还没有内容</Text>
-              <Text className='empty-desc'>成为第一个分享的人吧</Text>
-          </View>
-        ) : (
-          posts.map(post => (
-              <View key={post.id} className='post-card'>
-              <View className='post-header'>
-                  <View 
-                    className='avatar'
-                    style={{ background: getAvatarColor(post.anonymous_name) }}
-                  >
-                    <Text className='avatar-text'>
-                      {post.anonymous_name.charAt(0)}
-                    </Text>
-                  </View>
-                  <View className='user-info'>
-                    <Text className='user-name'>{post.anonymous_name}</Text>
-                <Text className='post-time'>{formatTime(post.created_at)}</Text>
-              </View>
-                </View>
-                
-              <Text className='post-content'>{post.content}</Text>
-                
-              {post.image_urls && post.image_urls.length > 0 && (
-                  <View className={`post-images count-${Math.min(post.image_urls.length, 3)}`}>
-                    {post.image_urls.slice(0, 9).map((url, index) => (
-                    <Image 
-                      key={index} 
-                      src={url} 
-                      mode='aspectFill' 
-                      className='post-image'
-                      onClick={() => Taro.previewImage({ urls: post.image_urls, current: url })}
-                    />
-                  ))}
-                </View>
-              )}
-                
-                <View className='post-actions'>
-                  <View className='action-item'>
-                    <Text className='action-icon'>❤️</Text>
-                    <Text className='action-text'>喜欢</Text>
-                  </View>
-                  <View className='action-item'>
-                    <Text className='action-icon'>💬</Text>
-                    <Text className='action-text'>评论</Text>
-                  </View>
-                </View>
-            </View>
-          ))
-        )}
-        </View>
-      </ScrollView>
     </View>
   );
 }

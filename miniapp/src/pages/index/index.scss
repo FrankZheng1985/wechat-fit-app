@@ -1,387 +1,155 @@
-// ============================================
-// 首页样式 - 橙紫活力风格
-// ============================================
-
-.index-page {
+.home-page {
   min-height: 100vh;
-  background: var(--color-bg);
-  padding-bottom: 120px;
+  padding: 60px 24px 100px;
+  position: relative;
+  box-sizing: border-box;
 }
 
-// Hero 区域
-.hero-section {
-  background: linear-gradient(180deg, #1F2937 0%, #374151 100%);
-  padding: 32px 24px 48px;
-  border-radius: 0 0 40px 40px;
+// 渐变背景
+.bg-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, #F8E8FF 0%, #FFE8F0 30%, #FFF5F5 60%, #FFFFFF 100%);
+  z-index: -1;
 }
 
-.hero-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+// 问候语
+.greeting-section {
   margin-bottom: 32px;
-}
   
-.user-greeting {
   .greeting-text {
+    font-size: 32px;
+    font-weight: bold;
+    color: #1F2937;
     display: block;
-    font-size: 42px;
-    font-weight: 700;
-    color: #FFFFFF;
     margin-bottom: 8px;
   }
   
-  .greeting-sub {
-    font-size: 26px;
-    color: rgba(255, 255, 255, 0.7);
+  .greeting-subtitle {
+    font-size: 16px;
+    color: #6B7280;
   }
 }
 
-.notification-btn {
-  width: 80px;
-  height: 80px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  .notification-icon {
-    font-size: 36px;
-  }
+// 统计卡片网格
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
 }
 
-// 今日目标卡片
-.today-goal-card {
-  background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
-  border-radius: 28px;
-  padding: 28px;
-  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
-}
-
-.goal-header {
-  text-align: center;
-  margin-bottom: 24px;
-  
-  .goal-title {
-    display: block;
-    font-size: 32px;
-    font-weight: 700;
-    color: #FFFFFF;
-    margin-bottom: 4px;
-  }
-  
-  .goal-subtitle {
-    font-size: 24px;
-    color: rgba(255, 255, 255, 0.8);
-  }
-}
-
-// 环形进度条
-.progress-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 28px;
-}
-
-.progress-ring-outer {
-  width: 280px;
-  height: 280px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.progress-ring-inner {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.progress-ring-fill {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  mask: radial-gradient(transparent 55%, #000 56%);
-  -webkit-mask: radial-gradient(transparent 55%, #000 56%);
-}
-
-.progress-content {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.15);
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  
-  .progress-value {
-    font-size: 56px;
-    font-weight: 800;
-    color: #FFFFFF;
-    line-height: 1;
-  }
-  
-  .progress-label {
-    font-size: 28px;
-    color: rgba(255, 255, 255, 0.9);
-    margin-top: 4px;
-  }
-  
-  .progress-goal {
-    font-size: 22px;
-    color: rgba(255, 255, 255, 0.6);
-    margin-top: 8px;
-  }
-}
-
-// 今日统计
-.today-stats {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  background: rgba(255, 255, 255, 0.15);
+.stat-card {
+  background: #FFFFFF;
   border-radius: 20px;
-  padding: 20px 16px;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   
   .stat-icon {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    margin-bottom: 12px;
+    font-size: 24px;
     
-    &.fire { background: rgba(249, 115, 22, 0.3); }
-    &.distance { background: rgba(16, 185, 129, 0.3); }
-    &.time { background: rgba(59, 130, 246, 0.3); }
-  }
-  
-  .stat-info {
-    display: flex;
-    flex-direction: column;
-  }
-    
-    .stat-value {
-    font-size: 36px;
-      font-weight: 700;
-    color: #FFFFFF;
-    line-height: 1.2;
+    &.orange {
+      background: linear-gradient(135deg, #FF6B35, #F7931E);
     }
     
-    .stat-label {
-    font-size: 22px;
-    color: rgba(255, 255, 255, 0.7);
+    &.blue {
+      background: linear-gradient(135deg, #00B4D8, #0096C7);
+    }
+    
+    &.green {
+      background: linear-gradient(135deg, #10B981, #059669);
+    }
+    
+    &.purple {
+      background: linear-gradient(135deg, #A855F7, #7C3AED);
     }
   }
-
-.stat-divider {
-  width: 1px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-// 主要内容区
-.main-content {
-  padding: 24px;
-  margin-top: -20px;
-}
-
-// 区块标题
-.section {
-  margin-bottom: 24px;
-}
   
-  .section-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--color-text-primary);
-    margin-bottom: 16px;
+  .stat-label {
+    font-size: 14px;
+    color: #6B7280;
     display: block;
-  }
-  
-// 快捷功能卡片
-.quick-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.action-card {
-  background: var(--color-dark);
-  border-radius: 24px;
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  box-shadow: var(--shadow-md);
-  
-  &.reading {
-    .action-title, .action-desc, .action-arrow {
-      color: #FFFFFF;
-    }
-    
-    .action-desc {
-      color: rgba(255, 255, 255, 0.6);
-    }
-  }
-  
-  .action-icon-wrapper {
-    width: 80px;
-    height: 80px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #F97316 0%, #FDBA74 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-    
-    .action-icon {
-      font-size: 40px;
-    }
-  }
-  
-  .action-info {
-    flex: 1;
-    
-    .action-title {
-      display: block;
-      font-size: 32px;
-      font-weight: 700;
-      color: #FFFFFF;
-      margin-bottom: 6px;
-    }
-    
-    .action-desc {
-      font-size: 24px;
-      color: rgba(255, 255, 255, 0.6);
-    }
-  }
-  
-  .action-arrow {
-    width: 48px;
-    height: 48px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    color: #FFFFFF;
-  }
-}
-
-.action-row {
-  display: flex;
-  gap: 16px;
-}
-
-.action-card-small {
-  flex: 1;
-  border-radius: 24px;
-  padding: 28px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  
-  .action-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
     margin-bottom: 4px;
   }
   
-  .action-title {
-    font-size: 30px;
-    font-weight: 700;
-    color: #FFFFFF;
+  .stat-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
   }
   
-  .action-desc {
-    font-size: 22px;
-    color: rgba(255, 255, 255, 0.8);
+  .stat-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #1F2937;
   }
   
-  &.sports {
-    background: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
-    box-shadow: 0 8px 24px rgba(249, 115, 22, 0.35);
-    
-    .action-icon {
-      background: rgba(255, 255, 255, 0.2);
-    }
-  }
-  
-  &.social {
-    background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
-    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);
-    
-    .action-icon {
-      background: rgba(255, 255, 255, 0.2);
-    }
+  .stat-unit {
+    font-size: 16px;
+    color: #9CA3AF;
   }
 }
 
-// 励志卡片
-.motivation-card {
-  background: linear-gradient(135deg, #1F2937 0%, #374151 100%);
-  border-radius: 24px;
-  padding: 24px;
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  box-shadow: var(--shadow-md);
-  
-  .motivation-icon {
-    font-size: 32px;
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #F97316 0%, #FDBA74 100%);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-  }
-  
-  .motivation-content {
-    flex: 1;
-  }
-  
-  .motivation-text {
+// 快捷入口
+.quick-section {
+  .section-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1F2937;
     display: block;
-    font-size: 28px;
-    color: #FFFFFF;
-    line-height: 1.6;
-    font-style: italic;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
+  }
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.quick-card {
+  border-radius: 24px;
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  
+  &.orange {
+    background: linear-gradient(135deg, #FF8A50, #FF6B35);
   }
   
-  .motivation-author {
-    font-size: 24px;
-    color: rgba(255, 255, 255, 0.6);
+  &.blue {
+    background: linear-gradient(135deg, #4FC3F7, #29B6F6);
+  }
+  
+  &.green {
+    background: linear-gradient(135deg, #66BB6A, #43A047);
+  }
+  
+  &.purple {
+    background: linear-gradient(135deg, #E879F9, #C026D3);
+  }
+  
+  .quick-emoji {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+  
+  .quick-label {
+    font-size: 18px;
+    font-weight: 600;
+    color: #FFFFFF;
   }
 }

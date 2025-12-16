@@ -1,90 +1,54 @@
-import { View, Text, Button } from '@tarojs/components';
-import Taro from '@tarojs/taro';
-import { useEffect, useState } from 'react';
+import { View, Text, ScrollView } from '@tarojs/components';
+import Taro, { useDidShow } from '@tarojs/taro';
+import { useState, useEffect } from 'react';
 import { wechatApi } from '../../services/api';
 import './index.scss';
 
-interface ActivityData {
-  steps: number;
-  calories: number;
-  distance: number;
-  date: string;
-}
-
-export default function SportsPage() {
-  const [todayData, setTodayData] = useState<ActivityData | null>(null);
-  const [history, setHistory] = useState<ActivityData[]>([]);
+export default function Sports() {
+  const [todayData, setTodayData] = useState<any>(null);
+  const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-
-  // 计算进度
-  const stepsGoal = 10000;
-  const caloriesGoal = 500;
-  const currentSteps = todayData?.steps || 0;
-  const currentCalories = todayData?.calories || 0;
-  const stepsProgress = Math.min((currentSteps / stepsGoal) * 100, 100);
-  const caloriesProgress = Math.min((currentCalories / caloriesGoal) * 100, 100);
+  const [userGoal, setUserGoal] = useState(10000);
 
   useEffect(() => {
-    // 页面加载时自动同步数据
-    autoSyncWeRun();
+    const userInfo = Taro.getStorageSync('userInfo');
+    if (userInfo?.daily_step_goal) {
+      setUserGoal(userInfo.daily_step_goal);
+    }
   }, []);
 
-  // 自动同步（静默同步，不显示loading）
-  const autoSyncWeRun = async () => {
-    try {
-      const userInfo = Taro.getStorageSync('userInfo');
-      const sessionKey = Taro.getStorageSync('sessionKey');
-      
-      if (!userInfo || !sessionKey) {
-        // 未登录，只获取历史记录
-        fetchHistory();
-        return;
-      }
-
-      const weRunData = await Taro.getWeRunData();
-      const result = await wechatApi.syncWeRun(
-        userInfo.id,
-        sessionKey,
-        weRunData.encryptedData,
-        weRunData.iv
-      );
-
-      if (result.success && result.data) {
-        setTodayData(result.data);
-      }
-      
-      // 获取历史记录
-      fetchHistory();
-    } catch (error) {
-      console.log('Auto sync skipped:', error);
-      // 自动同步失败不提示，静默处理
-      fetchHistory();
-    }
-  };
+  useDidShow(() => {
+    fetchHistory();
+    handleSyncWeRun(true);
+  });
 
   const fetchHistory = async () => {
     const userInfo = Taro.getStorageSync('userInfo');
-    if (userInfo?.id) {
-      const result = await wechatApi.getActivities(userInfo.id);
+    if (!userInfo?.id) return;
+
+    try {
+      const result = await wechatApi.getActivities(userInfo.id, 7);
       if (result.success && result.data) {
         setHistory(result.data);
         const today = new Date().toISOString().split('T')[0];
-        const todayRecord = result.data.find((d: ActivityData) => d.date === today);
-        if (todayRecord) {
-          setTodayData(todayRecord);
+        const todayActivity = result.data.find((a: any) => a.date === today);
+        if (todayActivity) {
+          setTodayData(todayActivity);
         }
       }
+    } catch (error) {
+      console.error('Fetch history error:', error);
     }
   };
 
-  const handleSyncWeRun = async () => {
+  const handleSyncWeRun = async (silent = false) => {
     setLoading(true);
     try {
       const userInfo = Taro.getStorageSync('userInfo');
       const sessionKey = Taro.getStorageSync('sessionKey');
-      
+
       if (!userInfo || !sessionKey) {
-        Taro.showToast({ title: '请先登录', icon: 'none' });
+        if (!silent) Taro.showToast({ title: '请先登录', icon: 'none' });
         setLoading(false);
         return;
       }
@@ -99,96 +63,77 @@ export default function SportsPage() {
 
       if (result.success && result.data) {
         setTodayData(result.data);
-        Taro.showToast({ title: '同步成功', icon: 'success' });
+        if (!silent) Taro.showToast({ title: '同步成功', icon: 'success' });
         fetchHistory();
-      } else {
-        Taro.showToast({ title: result.message || '同步失败', icon: 'none' });
       }
     } catch (error) {
       console.error('Sync error:', error);
-      Taro.showToast({ title: '同步失败，请授权微信运动', icon: 'none' });
+      if (!silent) Taro.showToast({ title: '请授权微信运动', icon: 'none' });
     }
     setLoading(false);
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    return `${month}月${day}日 ${weekDays[date.getDay()]}`;
+  const steps = todayData?.step_count || 0;
+  const calories = todayData?.calories_burned || Math.round(steps * 0.04);
+  const distance = todayData?.distance || (steps * 0.7 / 1000).toFixed(1);
+  const progress = Math.min((steps / userGoal) * 100, 100);
+
+  const getProgressColor = () => {
+    if (progress >= 100) return '#10B981';
+    if (progress >= 60) return '#F59E0B';
+    return '#3B82F6';
   };
 
   return (
     <View className='sports-page'>
-      {/* 顶部进度区域 */}
-      <View className='progress-hero'>
-        <View className='hero-header'>
-          <Text className='page-title'>Progress</Text>
-          <Text className='page-subtitle'>查看你的运动数据</Text>
-        </View>
-
-        {/* 时间筛选 */}
-        <View className='time-filter'>
-          <View className='filter-item active'>
-            <Text>7 days</Text>
-          </View>
-          <View className='filter-item'>
-            <Text>30 days</Text>
-          </View>
-          <View className='filter-item'>
-            <Text>90 days</Text>
-          </View>
+      <View className='bg-gradient' />
+      
+      {/* 标题 */}
+      <View className='page-header'>
+        <Text className='page-title'>运动统计 🏃</Text>
+        <Text className='page-subtitle'>记录每一步，见证每一天</Text>
       </View>
 
-        {/* 主环形进度 - 卡路里 */}
-        <View className='main-progress'>
-          <View className='progress-ring-large'>
+      {/* 主进度卡片 */}
+      <View className='main-card'>
+        <View className='progress-ring'>
+          <View className='ring-bg'>
             <View 
-              className='progress-fill-outer'
+              className='ring-progress' 
               style={{ 
-                background: `conic-gradient(#8B5CF6 ${caloriesProgress * 3.6}deg, rgba(255,255,255,0.1) 0deg)` 
+                background: `conic-gradient(${getProgressColor()} ${progress * 3.6}deg, #E5E7EB ${progress * 3.6}deg)` 
               }}
             />
-            <View 
-              className='progress-fill-inner'
-              style={{ 
-                background: `conic-gradient(#F97316 ${stepsProgress * 3.6}deg, rgba(255,255,255,0.15) 0deg)` 
-              }}
-            />
-            <View className='progress-center'>
-              <Text className='kcal-icon'>🔥</Text>
-              <Text className='progress-value'>{currentCalories}</Text>
-              <Text className='progress-unit'>kcal</Text>
+            <View className='ring-inner'>
+              <Text className='ring-value'>{steps.toLocaleString()}</Text>
+              <Text className='ring-label'>步</Text>
             </View>
           </View>
         </View>
-
-        {/* 底部统计 */}
+        
         <View className='stats-row'>
-          <View className='stat-circle'>
-            <View className='stat-ring'>
-              <Text className='stat-value'>{(currentSteps / 1000).toFixed(1)}k</Text>
-              <Text className='stat-label'>Steps</Text>
-            </View>
+          <View className='stat-item'>
+            <Text className='stat-icon'>🔥</Text>
+            <Text className='stat-value'>{calories}</Text>
+            <Text className='stat-label'>卡路里</Text>
           </View>
-          <View className='stat-circle'>
-            <View className='stat-ring purple'>
-            <Text className='stat-value'>{todayData?.distance || 0}</Text>
-              <Text className='stat-label'>公里</Text>
-            </View>
+          <View className='stat-item'>
+            <Text className='stat-icon'>📍</Text>
+            <Text className='stat-value'>{distance}</Text>
+            <Text className='stat-label'>公里</Text>
+          </View>
+          <View className='stat-item'>
+            <Text className='stat-icon'>🎯</Text>
+            <Text className='stat-value'>{Math.round(progress)}%</Text>
+            <Text className='stat-label'>目标</Text>
           </View>
         </View>
 
-        {/* 按钮组 */}
-        <View className='action-buttons'>
-        <Button 
-            className='btn-sync'
-          onClick={handleSyncWeRun}
-          loading={loading}
+        <View 
+          className={`sync-btn ${loading ? 'loading' : ''}`} 
+          onClick={() => !loading && handleSyncWeRun()}
         >
-            同步运动数据
-        </Button>
+          <Text>{loading ? '同步中...' : '🔄 同步数据'}</Text>
         </View>
       </View>
 
@@ -196,37 +141,45 @@ export default function SportsPage() {
       <View className='history-section'>
         <Text className='section-title'>历史记录</Text>
         
-        {history.length === 0 ? (
-          <View className='empty-state'>
-            <Text className='empty-icon'>📊</Text>
-            <Text className='empty-text'>暂无历史记录</Text>
-            <Text className='empty-hint'>点击上方按钮同步数据</Text>
-          </View>
-        ) : (
-          <View className='history-list'>
-            {history.slice(0, 7).map((item, index) => (
+        <ScrollView scrollY className='history-list'>
+          <View className='history-list-inner'>
+            {history.length > 0 ? history.map((item, index) => (
               <View key={index} className='history-card'>
-                <View className='history-left'>
-              <Text className='history-date'>{formatDate(item.date)}</Text>
+                <View className='history-date'>
+                  <Text className='date-day'>
+                    {new Date(item.date).getDate()}
+                  </Text>
+                  <Text className='date-month'>
+                    {new Date(item.date).getMonth() + 1}月
+                  </Text>
                 </View>
-                <View className='history-right'>
-                  <View className='history-stat'>
-                    <Text className='stat-icon'>👟</Text>
-                    <Text className='stat-num'>{item.steps?.toLocaleString()}</Text>
-                  </View>
-                  <View className='history-stat'>
-                    <Text className='stat-icon'>🔥</Text>
-                    <Text className='stat-num'>{item.calories}</Text>
-                  </View>
-                  <View className='history-stat'>
-                    <Text className='stat-icon'>📍</Text>
-                    <Text className='stat-num'>{item.distance}km</Text>
+                <View className='history-info'>
+                  <Text className='history-steps'>
+                    {item.step_count?.toLocaleString() || 0} 步
+                  </Text>
+                  <View className='history-bar'>
+                    <View 
+                      className='history-bar-fill'
+                      style={{ 
+                        width: `${Math.min((item.step_count / userGoal) * 100, 100)}%`,
+                        background: item.step_count >= userGoal ? '#10B981' : '#3B82F6'
+                      }}
+                    />
                   </View>
                 </View>
+                {item.step_count >= userGoal && (
+                  <Text className='history-badge'>🎉</Text>
+                )}
               </View>
-            ))}
-            </View>
-        )}
+            )) : (
+              <View className='empty-state'>
+                <Text className='empty-emoji'>📊</Text>
+                <Text className='empty-text'>暂无运动记录</Text>
+                <Text className='empty-hint'>点击同步获取微信运动数据</Text>
+              </View>
+            )}
+          </View>
+        </ScrollView>
       </View>
     </View>
   );

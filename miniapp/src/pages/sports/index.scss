@@ -1,281 +1,243 @@
-// ============================================
-// 运动页样式 - 橙紫活力风格
-// ============================================
-
 .sports-page {
   min-height: 100vh;
-  background: var(--color-bg);
-  padding-bottom: 120px;
+  padding: 24px;
+  padding-bottom: 100px;
+  position: relative;
+  box-sizing: border-box;
 }
 
-// 顶部进度区域
-.progress-hero {
-  background: linear-gradient(180deg, #1F2937 0%, #374151 100%);
-  padding: 32px 24px 48px;
-  border-radius: 0 0 40px 40px;
+.bg-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, #E8F5FF 0%, #F0F9FF 30%, #FFFFFF 100%);
+  z-index: -1;
 }
 
-.hero-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+// 页面头部
+.page-header {
   margin-bottom: 24px;
   
   .page-title {
-    font-size: 42px;
-    font-weight: 700;
-    color: #FFFFFF;
+    font-size: 28px;
+    font-weight: bold;
+    color: #1F2937;
+    display: block;
+    margin-bottom: 4px;
   }
   
   .page-subtitle {
-    font-size: 24px;
-    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    color: #6B7280;
   }
 }
 
-// 时间筛选
-.time-filter {
+// 主卡片
+.main-card {
+  background: #FFFFFF;
+  border-radius: 28px;
+  padding: 32px 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+}
+
+// 进度环
+.progress-ring {
   display: flex;
-  gap: 12px;
-  margin-bottom: 32px;
+  justify-content: center;
+  margin-bottom: 24px;
   
-  .filter-item {
-    padding: 12px 24px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.1);
+  .ring-bg {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    position: relative;
+  }
+  
+  .ring-progress {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    mask: radial-gradient(transparent 65%, black 65%);
+    -webkit-mask: radial-gradient(transparent 65%, black 65%);
+  }
+  
+  .ring-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
     
-    Text {
-      font-size: 24px;
-      color: rgba(255, 255, 255, 0.6);
+    .ring-value {
+      font-size: 42px;
+      font-weight: bold;
+      color: #1F2937;
+      display: block;
     }
     
-    &.active {
-      background: var(--color-secondary);
-      
-      Text {
-        color: #FFFFFF;
-        font-weight: 600;
-  }
-}
+    .ring-label {
+      font-size: 16px;
+      color: #9CA3AF;
+    }
   }
 }
 
-// 主环形进度
-.main-progress {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 32px;
-}
-
-.progress-ring-large {
-  width: 320px;
-  height: 320px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.progress-fill-outer {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  mask: radial-gradient(transparent 65%, #000 66%);
-  -webkit-mask: radial-gradient(transparent 65%, #000 66%);
-}
-
-.progress-fill-inner {
-  position: absolute;
-  width: 80%;
-  height: 80%;
-  border-radius: 50%;
-  mask: radial-gradient(transparent 60%, #000 61%);
-  -webkit-mask: radial-gradient(transparent 60%, #000 61%);
-}
-
-.progress-center {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 200px;
-  height: 200px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  
-  .kcal-icon {
-    font-size: 32px;
-    margin-bottom: 8px;
-  }
-  
-  .progress-value {
-    font-size: 64px;
-    font-weight: 800;
-    color: #FFFFFF;
-    line-height: 1;
-  }
-  
-  .progress-unit {
-    font-size: 28px;
-    color: rgba(255, 255, 255, 0.7);
-    margin-top: 4px;
-  }
-}
-
-// 底部统计
+// 统计行
 .stats-row {
-    display: flex;
-  justify-content: center;
-  gap: 48px;
-  margin-bottom: 32px;
-  }
+  display: flex;
+  justify-content: space-around;
+  padding: 20px 0;
+  border-top: 1px solid #F3F4F6;
+  border-bottom: 1px solid #F3F4F6;
+  margin-bottom: 20px;
   
-.stat-circle {
-  .stat-ring {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    border: 6px solid var(--color-primary);
+  .stat-item {
+    text-align: center;
+    
+    .stat-icon {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 8px;
+    }
+    
+    .stat-value {
+      font-size: 22px;
+      font-weight: bold;
+      color: #1F2937;
+      display: block;
+      margin-bottom: 4px;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #9CA3AF;
+    }
+  }
+}
+
+// 同步按钮
+.sync-btn {
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  
+  &.loading {
+    opacity: 0.7;
+  }
+}
+
+// 历史记录
+.history-section {
+  .section-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1F2937;
+    display: block;
+    margin-bottom: 16px;
+  }
+}
+
+.history-list {
+  height: 300px;
+}
+
+.history-list-inner {
+  padding-right: 4px;
+}
+
+.history-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  
+  .history-date {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: rgba(249, 115, 22, 0.1);
+    margin-right: 16px;
     
-    &.purple {
-      border-color: var(--color-secondary);
-      background: rgba(139, 92, 246, 0.1);
+    .date-day {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1F2937;
+      line-height: 1;
     }
     
-    .stat-value {
-      font-size: 36px;
-      font-weight: 700;
-      color: #FFFFFF;
-    }
-    
-    .stat-label {
-      font-size: 22px;
-      color: rgba(255, 255, 255, 0.7);
+    .date-month {
+      font-size: 10px;
+      color: #6B7280;
     }
   }
-}
-
-// 按钮组
-.action-buttons {
-  display: flex;
-  gap: 16px;
   
-  .btn-sync {
+  .history-info {
     flex: 1;
-    background: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
-    color: #FFFFFF;
-    border-radius: 24px;
-    font-size: 32px;
-    font-weight: 700;
-    padding: 24px;
-    border: none;
-    box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
     
-    &::after {
-      border: none;
+    .history-steps {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1F2937;
+      display: block;
+      margin-bottom: 8px;
     }
     
-    &:active {
-      transform: scale(0.98);
-      opacity: 0.95;
+    .history-bar {
+      height: 6px;
+      background: #F3F4F6;
+      border-radius: 3px;
+      overflow: hidden;
+      
+      .history-bar-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s ease;
+      }
     }
   }
-}
-
-// 历史记录区域
-.history-section {
-  padding: 24px;
-  margin-top: -20px;
   
-  .section-title {
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    margin-bottom: 16px;
-    display: block;
+  .history-badge {
+    font-size: 24px;
+    margin-left: 12px;
   }
 }
 
 // 空状态
 .empty-state {
-  background: var(--color-card);
-  border-radius: 20px;
-  padding: 48px 24px;
   text-align: center;
-  box-shadow: var(--shadow-sm);
+  padding: 60px 20px;
   
-  .empty-icon {
+  .empty-emoji {
     font-size: 64px;
     display: block;
     margin-bottom: 16px;
   }
   
   .empty-text {
-    font-size: 30px;
-    color: var(--color-text-primary);
+    font-size: 18px;
+    font-weight: 600;
+    color: #6B7280;
     display: block;
     margin-bottom: 8px;
   }
   
   .empty-hint {
-    font-size: 26px;
-    color: var(--color-text-muted);
+    font-size: 14px;
+    color: #9CA3AF;
   }
 }
 
-// 历史列表
-.history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  }
-  
-.history-card {
-  background: var(--color-card);
-  border-radius: 16px;
-  padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  box-shadow: var(--shadow-sm);
-    
-  .history-left {
-    .history-date {
-      font-size: 28px;
-      font-weight: 600;
-      color: var(--color-text-primary);
-    }
-  }
-  
-  .history-right {
-    display: flex;
-    gap: 20px;
-    
-    .history-stat {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--color-bg);
-      padding: 8px 14px;
-      border-radius: 12px;
-      
-      .stat-icon {
-        font-size: 20px;
-      }
-      
-      .stat-num {
-        font-size: 24px;
-        font-weight: 600;
-        color: var(--color-text-primary);
-      }
-    }
-  }
-}

@@ -1,36 +1,32 @@
 import { View, Text } from '@tarojs/components';
-import Taro from '@tarojs/taro';
-import { useEffect, useState } from 'react';
+import Taro, { useDidShow } from '@tarojs/taro';
+import { useState, useEffect } from 'react';
 import { wechatApi } from '../../services/api';
 import './index.scss';
 
 export default function Index() {
   const [userInfo, setUserInfo] = useState<any>(null);
-  const [todayStats, setTodayStats] = useState({ 
-    steps: 0, 
-    calories: 0, 
-    distance: 0,
-    minutes: 0 
+  const [greeting, setGreeting] = useState('你好');
+  const [stats, setStats] = useState({
+    consecutiveDays: 0,
+    achievements: 0,
+    goalCompletion: 0,
+    activeDays: 0,
+    todaySteps: 0
   });
-  const [greeting, setGreeting] = useState('早上好');
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // 设置问候语
     const hour = new Date().getHours();
     if (hour < 12) setGreeting('早上好');
     else if (hour < 18) setGreeting('下午好');
     else setGreeting('晚上好');
 
-    // 尝试自动登录并获取运动数据
-    initData();
+    handleLogin();
   }, []);
 
-  const initData = async () => {
-    setIsLoading(true);
-    await handleLogin();
-    setIsLoading(false);
-  };
+  useDidShow(() => {
+    fetchStats();
+  });
 
   const handleLogin = async () => {
     try {
@@ -42,21 +38,19 @@ export default function Index() {
           setUserInfo(user);
           Taro.setStorageSync('userInfo', user);
           Taro.setStorageSync('sessionKey', result.data.sessionKey);
-          
+
           // 检查是否需要引导
           const userDetail = await wechatApi.getUser(user.id);
           if (userDetail.success && userDetail.data) {
-            // 如果用户未完成引导，跳转到引导页
             if (!userDetail.data.is_onboarded) {
               Taro.navigateTo({ url: '/pages/onboarding/index' });
               return;
             }
-            // 更新本地用户信息
             Taro.setStorageSync('userInfo', { ...user, ...userDetail.data });
+            setUserInfo({ ...user, ...userDetail.data });
           }
-          
-          // 登录成功后自动获取今日运动数据
-          await fetchTodayStats(user.id, result.data.sessionKey);
+
+          fetchStats();
         }
       }
     } catch (error) {
@@ -64,177 +58,134 @@ export default function Index() {
     }
   };
 
-  // 获取今日运动数据
-  const fetchTodayStats = async (userId: number, sessionKey: string) => {
-    try {
-      // 尝试自动同步微信运动数据
-      const weRunData = await Taro.getWeRunData();
-      const result = await wechatApi.syncWeRun(
-        userId,
-        sessionKey,
-        weRunData.encryptedData,
-        weRunData.iv
-      );
+  const fetchStats = async () => {
+    const user = Taro.getStorageSync('userInfo');
+    if (!user?.id) return;
 
+    try {
+      const result = await wechatApi.getActivities(user.id, 30);
       if (result.success && result.data) {
-        const data = result.data;
-        setTodayStats({
-          steps: data.steps || 0,
-          calories: data.calories || 0,
-          distance: data.distance || 0,
-          minutes: Math.round((data.steps || 0) / 100) // 估算运动时间
+        const activities = result.data;
+        const today = new Date().toISOString().split('T')[0];
+        const todayActivity = activities.find((a: any) => a.date === today);
+        
+        // 计算连续打卡天数
+        let consecutive = 0;
+        const sortedDates = activities.map((a: any) => a.date).sort().reverse();
+        for (let i = 0; i < sortedDates.length; i++) {
+          const expectedDate = new Date();
+          expectedDate.setDate(expectedDate.getDate() - i);
+          if (sortedDates[i] === expectedDate.toISOString().split('T')[0]) {
+            consecutive++;
+          } else break;
+        }
+
+        // 计算目标完成率
+        const dailyGoal = user.daily_step_goal || 10000;
+        const completion = todayActivity 
+          ? Math.min(Math.round((todayActivity.step_count / dailyGoal) * 100), 100)
+          : 0;
+
+        setStats({
+          consecutiveDays: consecutive,
+          achievements: Math.floor(activities.length / 7), // 每周一个成就
+          goalCompletion: completion,
+          activeDays: activities.length,
+          todaySteps: todayActivity?.step_count || 0
         });
       }
     } catch (error) {
-      console.log('Auto fetch stats skipped:', error);
-      // 如果获取失败，尝试从历史记录获取今日数据
-      try {
-        const historyResult = await wechatApi.getActivities(userId);
-        if (historyResult.success && historyResult.data && historyResult.data.length > 0) {
-          const today = new Date().toISOString().split('T')[0];
-          const todayRecord = historyResult.data.find((d: any) => d.date === today);
-          if (todayRecord) {
-            setTodayStats({
-              steps: todayRecord.step_count || todayRecord.steps || 0,
-              calories: todayRecord.calories_burned || todayRecord.calories || 0,
-              distance: todayRecord.distance || 0,
-              minutes: Math.round((todayRecord.step_count || todayRecord.steps || 0) / 100)
-            });
-          }
-        }
-      } catch (e) {
-        console.log('Fetch history failed:', e);
-      }
+      console.error('Fetch stats error:', error);
     }
   };
 
-  // 计算步数进度百分比
-  const stepsGoal = 10000;
-  const stepsProgress = Math.min((todayStats.steps / stepsGoal) * 100, 100);
+  const navigateTo = (page: string) => {
+    Taro.switchTab({ url: `/pages/${page}/index` });
+  };
+
+  const nickname = userInfo?.nickname || '小明';
 
   return (
-    <View className='index-page'>
-      {/* 顶部 Hero 区域 */}
-      <View className='hero-section'>
-        <View className='hero-header'>
-          <View className='user-greeting'>
-            <Text className='greeting-text'>{greeting}！</Text>
-            <Text className='greeting-sub'>今天也要元气满满哦 💪</Text>
+    <View className='home-page'>
+      {/* 背景装饰 */}
+      <View className='bg-gradient' />
+      
+      {/* 问候语 */}
+      <View className='greeting-section'>
+        <Text className='greeting-text'>{greeting}，{nickname} 👋</Text>
+        <Text className='greeting-subtitle'>今天也要元气满满哦！</Text>
+      </View>
+
+      {/* 统计卡片 */}
+      <View className='stats-grid'>
+        <View className='stat-card'>
+          <View className='stat-icon orange'>
+            <Text>🔥</Text>
           </View>
-          <View className='notification-btn'>
-            <Text className='notification-icon'>🔔</Text>
+          <Text className='stat-label'>连续打卡</Text>
+          <View className='stat-value-row'>
+            <Text className='stat-value'>{stats.consecutiveDays}</Text>
+            <Text className='stat-unit'>天</Text>
           </View>
         </View>
 
-        {/* 今日目标卡片 */}
-        <View className='today-goal-card'>
-          <View className='goal-header'>
-            <Text className='goal-title'>Today's Goal</Text>
-            <Text className='goal-subtitle'>每日健康目标</Text>
-      </View>
-
-          {/* 环形进度 */}
-          <View className='progress-container'>
-            <View className='progress-ring-outer'>
-              <View className='progress-ring-inner'>
-                <View 
-                  className='progress-ring-fill'
-                  style={{ 
-                    background: `conic-gradient(#F97316 ${stepsProgress * 3.6}deg, rgba(255,255,255,0.1) 0deg)` 
-                  }}
-                />
-                <View className='progress-content'>
-                  <Text className='progress-value'>{todayStats.steps.toLocaleString()}</Text>
-                  <Text className='progress-label'>步</Text>
-                  <Text className='progress-goal'>目标 {stepsGoal.toLocaleString()}</Text>
-                </View>
-              </View>
-            </View>
+        <View className='stat-card'>
+          <View className='stat-icon orange'>
+            <Text>🏆</Text>
           </View>
+          <Text className='stat-label'>成就徽章</Text>
+          <View className='stat-value-row'>
+            <Text className='stat-value'>{stats.achievements}</Text>
+            <Text className='stat-unit'>个</Text>
+          </View>
+        </View>
 
-          {/* 今日统计 */}
-          <View className='today-stats'>
-          <View className='stat-item'>
-              <View className='stat-icon fire'>🔥</View>
-              <View className='stat-info'>
-            <Text className='stat-value'>{todayStats.calories}</Text>
-            <Text className='stat-label'>卡路里</Text>
-              </View>
-            </View>
-            <View className='stat-divider' />
-            <View className='stat-item'>
-              <View className='stat-icon distance'>📍</View>
-              <View className='stat-info'>
-                <Text className='stat-value'>{todayStats.distance}</Text>
-                <Text className='stat-label'>公里</Text>
-              </View>
-            </View>
-            <View className='stat-divider' />
-            <View className='stat-item'>
-              <View className='stat-icon time'>⏱</View>
-              <View className='stat-info'>
-                <Text className='stat-value'>{todayStats.minutes}</Text>
-                <Text className='stat-label'>分钟</Text>
-              </View>
-            </View>
+        <View className='stat-card'>
+          <View className='stat-icon blue'>
+            <Text>🎯</Text>
+          </View>
+          <Text className='stat-label'>目标完成</Text>
+          <View className='stat-value-row'>
+            <Text className='stat-value'>{stats.goalCompletion}</Text>
+            <Text className='stat-unit'>%</Text>
+          </View>
+        </View>
+
+        <View className='stat-card'>
+          <View className='stat-icon green'>
+            <Text>📅</Text>
+          </View>
+          <Text className='stat-label'>活跃天数</Text>
+          <View className='stat-value-row'>
+            <Text className='stat-value'>{stats.activeDays}</Text>
+            <Text className='stat-unit'>天</Text>
           </View>
         </View>
       </View>
 
-      {/* 主要内容区 */}
-      <View className='main-content'>
-        {/* 快捷功能 */}
-        <View className='section'>
-          <Text className='section-title'>快捷功能</Text>
-          <View className='quick-actions'>
-          <View 
-              className='action-card reading'
-            onClick={() => Taro.switchTab({ url: '/pages/youtube/index' })}
-          >
-              <View className='action-icon-wrapper'>
-                <Text className='action-icon'>📚</Text>
-              </View>
-              <View className='action-info'>
-                <Text className='action-title'>读书视频</Text>
-                <Text className='action-desc'>精选博主内容推荐</Text>
-              </View>
-              <View className='action-arrow'>
-                <Text>→</Text>
-              </View>
+      {/* 快捷入口 */}
+      <View className='quick-section'>
+        <Text className='section-title'>快捷入口</Text>
+        
+        <View className='quick-grid'>
+          <View className='quick-card orange' onClick={() => navigateTo('sports')}>
+            <Text className='quick-emoji'>🏃</Text>
+            <Text className='quick-label'>开始运动</Text>
           </View>
-
-            <View className='action-row'>
-          <View 
-                className='action-card-small sports'
-            onClick={() => Taro.switchTab({ url: '/pages/sports/index' })}
-          >
-                <View className='action-icon'>
-                  <Text>🏃</Text>
-                </View>
-                <Text className='action-title'>运动记录</Text>
-                <Text className='action-desc'>同步微信运动</Text>
+          
+          <View className='quick-card blue' onClick={() => navigateTo('youtube')}>
+            <Text className='quick-emoji'>📚</Text>
+            <Text className='quick-label'>学习打卡</Text>
           </View>
-
-          <View 
-                className='action-card-small social'
-            onClick={() => Taro.switchTab({ url: '/pages/social/index' })}
-          >
-                <View className='action-icon'>
-                  <Text>💬</Text>
-                </View>
-                <Text className='action-title'>匿名树洞</Text>
-                <Text className='action-desc'>分享心情</Text>
-              </View>
-            </View>
+          
+          <View className='quick-card green' onClick={() => navigateTo('sports')}>
+            <Text className='quick-emoji'>👥</Text>
+            <Text className='quick-label'>组队挑战</Text>
           </View>
-        </View>
-
-        {/* 励志卡片 */}
-        <View className='motivation-card'>
-          <View className='motivation-icon'>💡</View>
-          <View className='motivation-content'>
-            <Text className='motivation-text'>"读书使人充实，运动使人健康，分享使人快乐。"</Text>
-            <Text className='motivation-author'>— 每日一句</Text>
+          
+          <View className='quick-card purple' onClick={() => navigateTo('social')}>
+            <Text className='quick-emoji'>✍️</Text>
+            <Text className='quick-label'>成长日记</Text>
           </View>
         </View>
       </View>
